@@ -17,7 +17,7 @@ class Ordenador{
         
         void determinaLimiarParticao(float limiarCusto);
 
-        void determinaLimiarQuebras(int limiarCusto);
+        void determinaLimiarQuebras(int limiarCusto,int limiarParticao);
 
         void imprimeEstatisticas();
 
@@ -25,6 +25,8 @@ class Ordenador{
         void partition3(int l,int r, int *i,int *j);
 
         void insercao(int l, int r);
+
+        void suffleVector(int numShuffle);
 
 };
 

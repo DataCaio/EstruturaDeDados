@@ -25,19 +25,19 @@ void Ordenador::ordenacao(){
         insercao(0,this->tamanho);
     }
 }
-/* CONSERTAR E ENTENDER OS PARAMETROS DO LAÇO WHILE, E DESCOBRIR COMO PASSAR O ATRIBUTO LIMPARTICAO CORRETAMENTE: NAO PASSAR SOMENTE O INDICE, MAS O ELEMENTO */
+/* DESCOBRIR COMO PASSAR O ATRIBUTO LIMPARTICAO CORRETAMENTE: NAO PASSAR SOMENTE O INDICE, MAS O ELEMENTO */
 void Ordenador::determinaLimiarParticao(float limiarCusto){
     int minMPS = 2;
     int maxMPS = tamanho;
     int passoMPS = (maxMPS - minMPS)/5;
-    int numMPS = 0,limParticao = 0,newMin = 0,newMax = 0;
+    int numMPS = 6,limParticao = 0,newMin = 0,newMax = 0;
     float diffCusto = 0; 
-    while((diffCusto > limiarCusto)){
+    while((diffCusto > limiarCusto) && (numMPS >= 5)){
         MeuVetor<int> custo,mpsAsspciado;
         numMPS = 0;
         for(int MPS = minMPS; MPS <=maxMPS; MPS+=passoMPS ){
             Ordenador ordenador(vetor,tamanho,MPS,limiarQuebras);
-            ordenador.ordenacao(); /* precisa colocar a anotar estatisticas */
+            ordenador.ordenacao(); 
             imprimeEstatisticas();
             custo.adicionar(ordenador.estatisticas[1]);
             mpsAsspciado.adicionar(MPS);
@@ -56,13 +56,13 @@ void Ordenador::determinaLimiarParticao(float limiarCusto){
             newMin = limiarParticao-1;
             newMax = limiarParticao+1;
         }
-        minMPS = mpsAsspciado.operator[](newMin);
-        maxMPS = mpsAsspciado.operator[](newMax);
+        minMPS = mpsAsspciado[newMin];
+        maxMPS = mpsAsspciado[newMax];
         passoMPS = (maxMPS - minMPS)/5;
         if(passoMPS == 0){
             passoMPS++;
         }
-        diffCusto = std::fabs(custo.operator[](newMin) - custo.operator[](newMax));
+        diffCusto = std::fabs(custo[newMin] - custo[newMax]);
         std::cout << "nummps " << numMPS << " " << "limParticao " << limParticao << " " << "mpsdiff " << diffCusto << std::endl;
     }
     this->limiarParticao = limParticao;
@@ -91,17 +91,17 @@ void Ordenador::quickSort3Ins(int l,int r){
 void Ordenador::partition3(int l, int r, int *i, int *j) {
     this->estatisticas[4]++;
     *i = l; *j = r;
-    int a = this->vetor.operator[](l);
-    int b = this->vetor.operator[]((l+r)/2);
-    int c = this->vetor.operator[](r);
+    int a = this->vetor[l];
+    int b = this->vetor[((l+r)/2)];
+    int c = this->vetor[r];
     int p = median(a, b, c);
   
     do{
-        while(p > this->vetor.operator[](*i)){
+        while(p > this->vetor[*i]){
             (*i)++;this->estatisticas[2]++;
         }
         this->estatisticas[2]++;
-        while(p < this->vetor.operator[](*j)){
+        while(p < this->vetor[*j]){
             (*j)--;this->estatisticas[2]++;
         }
         this->estatisticas[2]++;
@@ -120,14 +120,14 @@ void Ordenador::insercao(int l, int r){
     int i,j,aux;
     for(i=l+1;i<=r;i++){
       
-      aux = vetor.operator[](i);
+      aux = vetor[i];
       this->estatisticas[3]++;
   
       j = i - 1;
   
-      while(j>=l && vetor.operator[](j)){
+      while(j>=l && vetor[j]){
         this->estatisticas[2];
-        vetor.atribuirValor(j+1,vetor.operator[](j));
+        vetor.atribuirValor(j+1,vetor[j]);
         this->estatisticas[3]++;
         j--;
       }
@@ -146,4 +146,59 @@ void Ordenador::imprimeEstatisticas(){
     std::cout << "calls " << estatisticas[0] << "\n"; 
 }
 
-void Ordenador::determinaLimiarQuebras(int limiarCusto){}; /* IMPLEMENTAR */
+void Ordenador::determinaLimiarQuebras(int limiarCusto,int limiarParticao){
+    int minQPS = 2;
+    int maxQPS = this->tamanho;
+    int passoQPS = (maxQPS - minQPS)/5;
+    int numQPS = 6,limParticao = 0,newMin = 0,newMax = 0;
+    float diffCusto = 0; 
+    while((diffCusto > limiarCusto) && (numQPS >= 5)){
+        MeuVetor<int> custo,mpsAsspciado;
+        numQPS = 0;
+        for(int QPS = minQPS; QPS <=maxQPS; QPS+=passoQPS ){
+            Ordenador ordenador(vetor,tamanho,limiarParticao,limiarQuebras);
+            ordenador.ordenacao(); 
+            imprimeEstatisticas();
+            custo.adicionar(ordenador.estatisticas[1]);
+            mpsAsspciado.adicionar(QPS);
+            numQPS++;
+        }
+        limParticao = custo.menorIndice();
+        if(limParticao == 0 ){
+            newMin = 0;
+            newMax = 2;
+        }
+        else if(limParticao == numQPS-1){
+            newMin = numQPS-3;
+            newMax = numQPS-1;
+        }
+        else{
+            newMin = limiarParticao-1;
+            newMax = limiarParticao+1;
+        }
+        minQPS = mpsAsspciado[newMin];
+        maxQPS = mpsAsspciado[newMax];
+        passoQPS = (maxQPS - minQPS)/5;
+        if(passoQPS == 0){
+            passoQPS++;
+        }
+        diffCusto = std::fabs(custo[newMin] - custo[newMax]);
+        std::cout << "nummps " << numQPS << " " << "limParticao " << limParticao << " " << "mpsdiff " << diffCusto << std::endl;
+    }
+    this->limiarParticao = limParticao;
+}; /* IMPLEMENTAR */
+void Ordenador::suffleVector(int numShuffle){
+    int p1 = 0, p2 = 0, temp;
+    for (int t = 0; t < numShuffle; t++) {
+        /* Gera dois índices distintos no intervalo [0..size-1] */
+        while (p1 == p2) {
+            p1 = (int)(drand48() * this->tamanho);
+            p2 = (int)(drand48() * this->tamanho);
+        }
+    /* Realiza a troca para introduzir uma quebra */
+        temp = this->vetor[p1];
+        this->vetor[p1] = this->vetor[p2];
+        this->vetor[p2] = temp;
+        p1 = p2 = 0;
+    }
+}
