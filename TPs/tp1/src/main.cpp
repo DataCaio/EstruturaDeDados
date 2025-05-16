@@ -58,32 +58,57 @@ typedef struct sortperf{
   return;
 } */
 
-// standard quicksort partition
-/* void partition(int * A, int l, int r, int *i, int *j, sortperf_t *s) {
+// quicksort with insertion for small partitions and median of 3
+/* void quickSort3Ins(int * A, int l, int r, sortperf_t *s) {
   inccalls(s,1);
-int p;
-*i = l; *j = r;
-p = A[(*i+*j)/2];
-do{
-  while(p > A[*i]){(*i)++;inccmp(s,1);}
-  inccmp(s,1);
-  while(p < A[*j]){(*j)--;inccmp(s,1);}
-  inccmp(s,1);
-  if(*i<=*j){
-    swap(&A[*i],&A[*j],s);
-    (*i)++;
-    (*j)--;
+  int i,j;
+  partition3(A,l,r,&i,&j,s);
+  
+  if(l<j){
+    if (j - l <= 50) {
+      insertionSort(A, l, j,s);
+    }
+    else{quickSort3Ins(A,l,j,s);}
   }
-}
-while(*i<=*j);
-}
+  
+  if(r>i){
+    if (r - i <= 50) {
+      insertionSort(A, i, r,s);
+    }
+    else{quickSort3Ins(A,i,r,s);
+    }
+  } 
+} */
 
-// standard quicksort
-void quickSort(int * A, int l, int r, sortperf_t *s) { 
-inccalls(s,1);
-int i,j;
-partition(A,l,r,&i,&j,s);
-if(l<j){quickSort(A,l,j,s);}
-if(r>i){quickSort(A,i,r,s);}
-}
- */
+// quicksort partition using median of 3
+/* void partition3(int * A, int l, int r, int *i, int *j, sortperf_t *s) {
+  inccalls(s,1);
+  *i = l; *j = r;
+  int a = A[l];
+  int b = A[(l + r) / 2];
+  int c = A[r];
+  int p = median(a, b, c);
+
+  do{
+    while(p > A[*i]){(*i)++;inccmp(s,1);}
+    inccmp(s,1);
+    while(p < A[*j]){(*j)--;inccmp(s,1);}
+    inccmp(s,1);
+    if(*i<=*j){
+      swap(&A[*i],&A[*j],s);
+      (*i)++;
+      (*j)--;
+    }
+  }
+  while(*i<=*j);
+} */
+
+/* // median of 3 integers
+int median (int a, int b, int c) {
+  if ((a <= b) && (b <= c)) return b;  // a b c
+  if ((a <= c) && (c <= b)) return c;  // a c b
+  if ((b <= a) && (a <= c)) return a;  // b a c
+  if ((b <= c) && (c <= a)) return c;  // b c a
+  if ((c <= a) && (a <= b)) return a;  // c a b
+  return b;                            // c b a
+} */

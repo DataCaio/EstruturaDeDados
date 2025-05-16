@@ -44,9 +44,38 @@ public:
         return tamanho;
     }
 
-    int menorIndice(){
-
+    void troca(int i, int j) {
+        if (i >= 0 && i < tamanho && j >= 0 && j < tamanho) {
+            T temp = dados[i];
+            dados[i] = dados[j];
+            dados[j] = temp;
+        } else {
+            throw std::out_of_range("Índice fora dos limites do vetor");
+        }
     }
+
+    int menorIndice() {
+        if (tamanho == 0) {
+            throw std::logic_error("Vetor vazio — não há menor elemento.");
+        }
+    
+        int indiceMenor = 0;
+        for (int i = 1; i < tamanho; ++i) {
+            if (dados[i] < dados[indiceMenor]) {
+                indiceMenor = i;
+            }
+        }
+        return indiceMenor;
+    }
+    void atribuirValor(int i, const T& valor) {
+        if (i >= 0 && i < tamanho) {
+            dados[i] = valor;
+        } else {
+            throw std::out_of_range("Índice fora dos limites do vetor");
+        }
+    }
+
+
 };
 
 #endif

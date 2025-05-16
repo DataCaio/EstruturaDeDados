@@ -8,29 +8,23 @@ class Ordenador{
          int tamanho;
          int limiarParticao;
          int limiarQuebras;
-         int estatisticas[5]; 
+         int estatisticas[5] = {0,0,0,0,0}; /* mps,custo,comparações,movimentações,chamadas */
     public:
         Ordenador(MeuVetor<int> vetor,int tamanho,int limiarParticao
             ,int limiarQuebras);
     
         void ordenacao();
         
-        void determinaLimiarParticao(int limiarCusto);
+        void determinaLimiarParticao(float limiarCusto);
 
-        void calculaNovaFaixa(int limParticao,int minMPS, 
-            int maxMPS,int passoMPS);
-
-        int determinaLimiarQuebras(MeuVetor<int>,int tamanho,
-            int limiarCusto);
-
-        int registraEstatisticas(int mps, int cost, int cmp, 
-            int move,int calls);
+        void determinaLimiarQuebras(int limiarCusto);
 
         void imprimeEstatisticas();
 
-        void quickSort();
+        void quickSort3Ins(int l,int r);
+        void partition3(int l,int r, int *i,int *j);
 
-        void insercao();
+        void insercao(int l, int r);
 
 };
 
