@@ -36,7 +36,7 @@ void Ordenador::ordenacao(){
     }
 }
 
-void Ordenador::determinaLimiarParticao(float limiarCusto){
+int Ordenador::determinaLimiarParticao(float limiarCusto){
     int idx = 0;
     int minMPS = 2;
     int maxMPS = tamanho;
@@ -81,6 +81,7 @@ void Ordenador::determinaLimiarParticao(float limiarCusto){
         std::cout << "nummps " << numMPS << " " << "limParticao " << melhorLimiar << " " << "mpsdiff " << diffCusto << std::endl;
     }
     this->limiarParticao = melhorLimiar;
+    return melhorLimiar;
 }
 
 void Ordenador::quickSort3Ins(int l,int r){
@@ -161,7 +162,7 @@ void Ordenador::imprimeEstatisticas(){
     std::cout << "calls " << estatisticas[4] << "\n"; 
 }
 
-void Ordenador::determinaLimiarQuebras(int limiarCusto,int limiarParticao){
+int Ordenador::determinaLimiarQuebras(int limiarCusto,int limiarParticao){
     int idx = 0;
 
     int minQPS = 1;
@@ -231,6 +232,7 @@ void Ordenador::determinaLimiarQuebras(int limiarCusto,int limiarParticao){
         std::cout << "numlq " << numQPS << " " << "limQuebras " << melhorQuebra << " " << "lqdiff " << diffCusto << std::endl;
     }
     this->limiarQuebras = melhorQuebra;
+    return melhorQuebra;
 }; /* IMPLEMENTAR */
 void Ordenador::suffleVector(int numShuffle){
     int p1 = 0, p2 = 0, temp;
@@ -246,4 +248,18 @@ void Ordenador::suffleVector(int numShuffle){
         this->vetor[p2] = temp;
         p1 = p2 = 0;
     }
+}
+
+int Ordenador::calculaQuebras(){
+    int quebras = 0;
+    for (int i = 1; i < tamanho; i++) {
+        if (vetor[i] < vetor[i - 1]) {
+            quebras++;
+        }
+    }
+    return quebras;
+}
+
+void Ordenador::calculaCusto(){
+    estatisticas[1] = constantes[0] * estatisticas[2] + constantes[1] * estatisticas[3] + constantes[2] * estatisticas[4];
 }

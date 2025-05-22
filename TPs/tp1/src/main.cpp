@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <cstdlib>
+#include <iomanip>
 #include "ordenadorUniversal.hpp"
 
 MeuVetor<int> geraVetor(int tamanho, int seed) {
@@ -51,20 +52,19 @@ int main(int argc, char* argv[]) {
 
     MeuVetor<int> vet = leArquivo(nomeArquivo, seed, limiarCusto, a, b, c, tam);
     
-    Ordenador ordenador = Ordenador(tam, a, b, c, seed);
+    int constantes[3] = {a,b,c};
+    Ordenador ordenador(vet,tam,0,0,constantes);
 
     // MeuVetor<int> vet = geraVetor(tam, 1);
 
     std::cout << "size " << tam
         << " seed " << seed
-        << " breaks " << ordenador.calculaQuebras(vet, tam) 
+        << " breaks " << ordenador.calculaQuebras() 
         << std::endl;
 
-    int limiarParticao = ordenador.determinaLimiarParticao(vet, tam, limiarCusto);
-    int limiarQuebras = ordenador.determinaLimiarQuebras(vet, tam, limiarCusto);
-
-    ordenador.ordena(vet, tam, limiarParticao, limiarQuebras);
-
+    int limiarParticao = ordenador.determinaLimiarParticao(limiarCusto);
+    int limiarQuebras = ordenador.determinaLimiarQuebras(limiarCusto,limiarParticao);
+    
     std::cout << std::endl;
 
     return 0;

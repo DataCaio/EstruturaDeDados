@@ -8,17 +8,17 @@ class Ordenador{
          int tamanho;
          int limiarParticao;
          int limiarQuebras;
-         int estatisticas[5] = {0,0,0,0,0}; /* mps,custo,comparações,movimentações,chamadas */
-         int constantes[3] = {0,0,0};
+         int estatisticas[5] = {0,0,0,0,0}; /* mps/qps,custo,comparações,movimentações,chamadas */
+         int constantes[3] = {0,0,0}; /* a,b,c */
     public:
         Ordenador(MeuVetor<int> vetor,int tamanho,int limiarParticao
             ,int limiarQuebras, int constantes[3]);
     
         void ordenacao();
         
-        void determinaLimiarParticao(float limiarCusto);
+        int determinaLimiarParticao(float limiarCusto);
 
-        void determinaLimiarQuebras(int limiarCusto,int limiarParticao);
+        int determinaLimiarQuebras(int limiarCusto,int limiarParticao);
 
         void imprimeEstatisticas();
 
@@ -32,6 +32,7 @@ class Ordenador{
         void resetaEstatisticas();
 
         void calculaCusto();
+        int calculaQuebras();
 
 };
 
