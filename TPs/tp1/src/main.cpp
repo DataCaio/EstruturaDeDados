@@ -3,20 +3,7 @@
 #include <string>
 #include <cstdlib>
 #include <iomanip>
-#include "ordenadorUniversal.hpp"
-
-MeuVetor<int> geraVetor(int tamanho, int seed) {
-    int i;
-    std::srand(seed);
-
-    MeuVetor<int> vet = MeuVetor<int>(tamanho);
-    for (i = 0; i < tamanho; i++) {
-        vet[i] = std::rand() % 1000;
-    }
-
-    return vet;
-}
-
+#include "ordenadorUniversal.hpp" 
 MeuVetor<int> leArquivo(std::string nomeArquivo, int& seed, double& limiarCusto, double& a, double& b, double& c, int& tamanho) {
     int i;
     std::ifstream arquivo(nomeArquivo.c_str());
@@ -28,11 +15,12 @@ MeuVetor<int> leArquivo(std::string nomeArquivo, int& seed, double& limiarCusto,
     arquivo >> seed >> limiarCusto >> a >> b >> c >> tamanho;
 
     MeuVetor<int> vet = MeuVetor<int>(tamanho);
+    int valor;
     for (i = 0; i < tamanho; i++) {
-        arquivo >> vet[i];
+        arquivo >> valor;
+        vet.adicionar(valor);
     }
     arquivo.close();
-
     return vet;
 }
 
@@ -51,17 +39,20 @@ int main(int argc, char* argv[]) {
     double limiarCusto, a, b, c;
 
     MeuVetor<int> vet = leArquivo(nomeArquivo, seed, limiarCusto, a, b, c, tam);
-    
-    int constantes[3] = {a,b,c};
-    Ordenador ordenador(vet,tam,0,0,constantes);
 
-    // MeuVetor<int> vet = geraVetor(tam, 1);
+    double constantes[3] = {a,b,c};
+
+    for(int i=0;i<3;i++){
+        std::cout << constantes[i]<< std::endl;
+    }
+
+    Ordenador ordenador(vet,vet.tamanhoAtual(),0,0,constantes);
 
     std::cout << "size " << tam
         << " seed " << seed
-        << " breaks " << ordenador.calculaQuebras() 
+        << " breaks " << ordenador.calculaQuebras()
         << std::endl;
-
+    
     int limiarParticao = ordenador.determinaLimiarParticao(limiarCusto);
     int limiarQuebras = ordenador.determinaLimiarQuebras(limiarCusto,limiarParticao);
     

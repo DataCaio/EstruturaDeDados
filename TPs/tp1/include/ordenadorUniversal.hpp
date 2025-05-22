@@ -8,15 +8,16 @@ class Ordenador{
          int tamanho;
          int limiarParticao;
          int limiarQuebras;
-         int estatisticas[5] = {0,0,0,0,0}; /* mps/qps,custo,comparações,movimentações,chamadas */
-         int constantes[3] = {0,0,0}; /* a,b,c */
+         float custo;
+         int estatisticas[4] = {0,0,0,0}; /* mps/qps,comparações,movimentações,chamadas */
+         double constantes[3] = {0,0,0}; /* a,b,c */
     public:
-        Ordenador(MeuVetor<int> vetor,int tamanho,int limiarParticao
-            ,int limiarQuebras, int constantes[3]);
+        Ordenador(const MeuVetor<int>& vetor,int tamanho,int limiarParticao
+            ,int limiarQuebras, double constantes[3]);
     
         void ordenacao();
         
-        int determinaLimiarParticao(float limiarCusto);
+        int determinaLimiarParticao(double limiarCusto);
 
         int determinaLimiarQuebras(int limiarCusto,int limiarParticao);
 

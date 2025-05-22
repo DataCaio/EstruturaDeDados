@@ -1,5 +1,6 @@
 #ifndef MEUVETOR_HPP
 #define MEUVETOR_HPP
+#include <iostream>
 
 template<typename T>
 class MeuVetor {
@@ -50,13 +51,13 @@ public:
             dados[i] = dados[j];
             dados[j] = temp;
         } else {
-            throw std::out_of_range("Índice fora dos limites do vetor");
+            throw std::invalid_argument("Índice fora dos limites do vetor");
         }
     }
 
     int menorIndice() {
         if (tamanho == 0) {
-            throw std::logic_error("Vetor vazio — não há menor elemento.");
+            throw std::invalid_argument("Vetor vazio — não há menor elemento.");
         }
     
         int indiceMenor = 0;
@@ -71,9 +72,31 @@ public:
         if (i >= 0 && i < tamanho) {
             dados[i] = valor;
         } else {
-            throw std::out_of_range("Índice fora dos limites do vetor");
+            throw std::invalid_argument("Índice fora dos limites do vetor");
         }
     }
+    // Construtor de cópia
+    MeuVetor(const MeuVetor& outro)
+    : capacidade(outro.capacidade), tamanho(outro.tamanho) {
+    dados = new T[capacidade];
+    for (int i = 0; i < tamanho; ++i) {
+        dados[i] = outro.dados[i];
+    }
+    }
+
+MeuVetor& operator=(const MeuVetor& outro) {
+    if (this != &outro) {
+        T* novoDados = new T[outro.capacidade];
+        for (int i = 0; i < outro.tamanho; ++i) {
+            novoDados[i] = outro.dados[i];
+        }
+        delete[] dados;
+        dados = novoDados;
+        capacidade = outro.capacidade;
+        tamanho = outro.tamanho;
+    }
+    return *this;
+}
 
 
 };
