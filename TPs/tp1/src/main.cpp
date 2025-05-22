@@ -1,114 +1,71 @@
-typedef struct sortperf{
-    int cmp;
-    int move;
-    int calls;
-  } sortperf_t;
-  
-  void resetcounter(sortperf_t * s){
-  // Descricao: inicializa estrutura
-  // Entrada: 
-  // Saida: s
-    s->cmp = 0;
-    s->move = 0;
-    s->calls = 0;
-  }
-  
-  void inccmp(sortperf_t * s, int num){
-  // Descricao: incrementa o numero de comparacoes em num 
-  // Entrada: s, num
-  // Saida: s
-    s->cmp += num;
-  }
-  
-  void incmove(sortperf_t * s, int num){
-  // Descricao: incrementa o numero de movimentacoes de dados em num 
-  // Entrada: s, num
-  // Saida: s
-    s->move += num;
-  }
-  
-  void inccalls(sortperf_t * s, int num){
-  // Descricao: incrementa o numero de chamadas de função em num 
-  // Entrada: s, num
-  // Saida: s
-    s->calls += num;
-  }
-//insertion sort
-/* void insertionSort(int v[], int l, int r, sortperf_t * s) {
-  inccalls(s,1);
-  int i,j,aux;
-  for(i=l+1;i<=r;i++){
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <cstdlib>
+#include "ordenadorUniversal.hpp"
+
+MeuVetor<int> geraVetor(int tamanho, int seed) {
+    int i;
+    std::srand(seed);
+
+    MeuVetor<int> vet = MeuVetor<int>(tamanho);
+    for (i = 0; i < tamanho; i++) {
+        vet[i] = std::rand() % 1000;
+    }
+
+    return vet;
+}
+
+MeuVetor<int> leArquivo(std::string nomeArquivo, int& seed, double& limiarCusto, double& a, double& b, double& c, int& tamanho) {
+    int i;
+    std::ifstream arquivo(nomeArquivo.c_str());
+    if (!arquivo.is_open()) {
+        std::cerr << "Erro ao abrir o arquivo: " << nomeArquivo << std::endl;
+        exit(1);
+    }
+
+    arquivo >> seed >> limiarCusto >> a >> b >> c >> tamanho;
+
+    MeuVetor<int> vet = MeuVetor<int>(tamanho);
+    for (i = 0; i < tamanho; i++) {
+        arquivo >> vet[i];
+    }
+    arquivo.close();
+
+    return vet;
+}
+
+
+int main(int argc, char* argv[]) {
+
+    if (argc < 2) {
+        std::cout << "Uso: " << argv[0] << " <nome_arquivo>" << std::endl;
+        return 1;
+    }
+    std::string nomeArquivo = (argc > 1) ? argv[1] : "";
+
+    std::cout << std::fixed << std::setprecision(9);
+
+    int seed, tam;
+    double limiarCusto, a, b, c;
+
+    MeuVetor<int> vet = leArquivo(nomeArquivo, seed, limiarCusto, a, b, c, tam);
     
-    aux = v[i];
-    incmove(s,1);
+    Ordenador ordenador = Ordenador(tam, a, b, c, seed);
 
-    j = i - 1;
+    // MeuVetor<int> vet = geraVetor(tam, 1);
 
-    while(j>=l && aux < v[j]){
-      inccmp(s,1);
-      v[j+1] = v[j];
-      incmove(s,1);
-      j--;
-    }
-    inccmp(s,1);
-    
-    v[j+1] = aux;
-    incmove(s,1);
-  }
-  return;
-} */
+    std::cout << "size " << tam
+        << " seed " << seed
+        << " breaks " << ordenador.calculaQuebras(vet, tam) 
+        << std::endl;
 
-// quicksort with insertion for small partitions and median of 3
-/* void quickSort3Ins(int * A, int l, int r, sortperf_t *s) {
-  inccalls(s,1);
-  int i,j;
-  partition3(A,l,r,&i,&j,s);
-  
-  if(l<j){
-    if (j - l <= 50) {
-      insertionSort(A, l, j,s);
-    }
-    else{quickSort3Ins(A,l,j,s);}
-  }
-  
-  if(r>i){
-    if (r - i <= 50) {
-      insertionSort(A, i, r,s);
-    }
-    else{quickSort3Ins(A,i,r,s);
-    }
-  } 
-} */
+    int limiarParticao = ordenador.determinaLimiarParticao(vet, tam, limiarCusto);
+    int limiarQuebras = ordenador.determinaLimiarQuebras(vet, tam, limiarCusto);
 
-// quicksort partition using median of 3
-/* void partition3(int * A, int l, int r, int *i, int *j, sortperf_t *s) {
-  inccalls(s,1);
-  *i = l; *j = r;
-  int a = A[l];
-  int b = A[(l + r) / 2];
-  int c = A[r];
-  int p = median(a, b, c);
+    ordenador.ordena(vet, tam, limiarParticao, limiarQuebras);
 
-  do{
-    while(p > A[*i]){(*i)++;inccmp(s,1);}
-    inccmp(s,1);
-    while(p < A[*j]){(*j)--;inccmp(s,1);}
-    inccmp(s,1);
-    if(*i<=*j){
-      swap(&A[*i],&A[*j],s);
-      (*i)++;
-      (*j)--;
-    }
-  }
-  while(*i<=*j);
-} */
+    std::cout << std::endl;
 
-/* // median of 3 integers
-int median (int a, int b, int c) {
-  if ((a <= b) && (b <= c)) return b;  // a b c
-  if ((a <= c) && (c <= b)) return c;  // a c b
-  if ((b <= a) && (a <= c)) return a;  // b a c
-  if ((b <= c) && (c <= a)) return c;  // b c a
-  if ((c <= a) && (a <= b)) return a;  // c a b
-  return b;                            // c b a
-} */
+    return 0;
+}

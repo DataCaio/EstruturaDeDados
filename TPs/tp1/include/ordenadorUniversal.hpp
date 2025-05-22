@@ -9,9 +9,10 @@ class Ordenador{
          int limiarParticao;
          int limiarQuebras;
          int estatisticas[5] = {0,0,0,0,0}; /* mps,custo,comparações,movimentações,chamadas */
+         int constantes[3] = {0,0,0};
     public:
         Ordenador(MeuVetor<int> vetor,int tamanho,int limiarParticao
-            ,int limiarQuebras);
+            ,int limiarQuebras, int constantes[3]);
     
         void ordenacao();
         
@@ -27,6 +28,10 @@ class Ordenador{
         void insercao(int l, int r);
 
         void suffleVector(int numShuffle);
+
+        void resetaEstatisticas();
+
+        void calculaCusto();
 
 };
 
