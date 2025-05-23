@@ -8,10 +8,12 @@ class Ordenador{
          int tamanho;
          int limiarParticao;
          int limiarQuebras;
-         float custo;
+         double custo;
          int estatisticas[4] = {0,0,0,0}; /* mps/qps,comparações,movimentações,chamadas */
-         double constantes[3] = {0,0,0}; /* a,b,c */
+         double constantes[3] = {0,0,0};  /* a,b,c */
+         int seed; 
     public:
+
         Ordenador(const MeuVetor<int>& vetor,int tamanho,int limiarParticao
             ,int limiarQuebras, double constantes[3]);
     
@@ -31,6 +33,8 @@ class Ordenador{
         void suffleVector(int numShuffle);
 
         void resetaEstatisticas();
+        
+        void definirSeed(int seed);
 
         void calculaCusto();
         int calculaQuebras();

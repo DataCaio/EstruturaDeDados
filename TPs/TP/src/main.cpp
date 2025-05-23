@@ -44,6 +44,8 @@ int main(int argc, char* argv[]) {
 
     Ordenador ordenador(vet,vet.tamanhoAtual(),0,0,constantes);
 
+    ordenador.definirSeed(seed);
+
     std::cout << "size " << tam
         << " seed " << seed
         << " breaks " << ordenador.calculaQuebras()

@@ -1,6 +1,7 @@
 #include "ordenadorUniversal.hpp"
 #include <iostream>
 #include <cmath>
+#include <iomanip>
 int median (int a, int b, int c) {
     if ((a <= b) && (b <= c)) return b;  // a b c
     if ((a <= c) && (c <= b)) return c;  // a c b
@@ -26,6 +27,7 @@ Ordenador::Ordenador(const MeuVetor<int>& vetor,int tamanho,int limiarParticao,i
         for(int i=0; i<3 ;i++){
             this->constantes[i] = constantes[i];
         }
+        this->seed = 0;
     }
 
 void Ordenador::ordenacao(){
@@ -50,11 +52,11 @@ int Ordenador::determinaLimiarParticao(double limiarCusto){
     if (passoMPS == 0) passoMPS=1;
 
     int numMPS = 6,limParticao = 0,newMin = 0,newMax = 0,melhorLimiar=0;
-    double diffCusto = limiarCusto + 1; 
+    float diffCusto = limiarCusto + 1; 
     while((diffCusto > limiarCusto) && (numMPS >= 5)){
         std::cout << std::endl << "iter " << idx++ << std::endl;
         MeuVetor<int> mpsAsspciado;
-        MeuVetor<float> custo;
+        MeuVetor<double> custo;
         numMPS = 0;
         MeuVetor<int> vetorOriginal = this->vetor;
         for(int MPS = minMPS; MPS <=maxMPS; MPS+=passoMPS ){
@@ -92,10 +94,11 @@ int Ordenador::determinaLimiarParticao(double limiarCusto){
             passoMPS++;
         }
 
-        diffCusto = std::fabs(custo[newMin] - custo[newMax]);
+        diffCusto = (float) std::fabs(custo[newMin] - custo[newMax]);
         melhorLimiar = mpsAsspciado[limParticao];
 
-        std::cout << "nummps " << numMPS << " " << "limParticao " << melhorLimiar << " " << "mpsdiff " << diffCusto << std::endl;
+        std::cout << "nummps " << numMPS << " " << "limParticao " << melhorLimiar << " " << "mpsdiff " << std::fixed << std::setprecision(6) 
+        << diffCusto << std::endl<< std::fixed << std::setprecision(9);
     }
     this->limiarParticao = melhorLimiar;
     return melhorLimiar;
@@ -143,7 +146,7 @@ void Ordenador::partition3(int l, int r, int *i, int *j) {
         this->estatisticas[1]++;
         
         if(*i<=*j){
-            this->estatisticas[2]++;
+            this->estatisticas[2] += 3;
             this->vetor.troca(*i,*j);
             (*i)++;
             (*j)--;
@@ -192,7 +195,7 @@ int Ordenador::determinaLimiarQuebras(int limiarCusto,int limiarParticao){
 
     int numQPS = 6,limQuebras = 0,newMin = 0,newMax = 0;
 
-    double diffCusto = limiarCusto + 1; 
+    float diffCusto = limiarCusto + 1; 
 
     int melhorQuebra;
     this->quickSort3Ins(0,this->tamanho-1);
@@ -201,12 +204,14 @@ int Ordenador::determinaLimiarQuebras(int limiarCusto,int limiarParticao){
     while((diffCusto > limiarCusto) && (numQPS >= 5)){
         std::cout << std::endl << "iter " << idx++ << std::endl;
         MeuVetor<int>qpsAssociado;
-        MeuVetor<float> custoIN,custoQS;
+        MeuVetor<double> custoIN,custoQS;
         numQPS = 0;
+        MeuVetor<int> vetorOriginal = this->vetor;
         for(int QPS = minQPS; QPS <=maxQPS; QPS+=passoQPS ){
-            Ordenador ordenador(this->vetor,this->tamanho,this->limiarParticao,QPS,this->constantes);
+            MeuVetor<int> copiaVetor = vetorOriginal;
+            Ordenador ordenador(copiaVetor,this->tamanho,limiarParticao,QPS,this->constantes);
             ordenador.estatisticas[0] = QPS;
-
+            ordenador.definirSeed(this->seed);
             ordenador.suffleVector(QPS);
             ordenador.quickSort3Ins(0,this->tamanho-1);
             ordenador.calculaCusto();
@@ -252,13 +257,16 @@ int Ordenador::determinaLimiarQuebras(int limiarCusto,int limiarParticao){
             passoQPS++;
         }
         melhorQuebra = qpsAssociado[limQuebras];
-        diffCusto = std::fabs(custoIN[newMin] - custoIN[newMax]);
-        std::cout << "numlq " << numQPS << " " << "limQuebras " << melhorQuebra << " " << "lqdiff " << diffCusto << std::endl;
+        diffCusto =(float) std::fabs(custoIN[newMin] - custoIN[newMax]);
+        std::cout << "numlq " << numQPS << " " << "limQuebras " << melhorQuebra << " " << "lqdiff "   << std::fixed << std::setprecision(6) 
+        << diffCusto << std::endl  << std::fixed << std::setprecision(9);
     }
     this->limiarQuebras = melhorQuebra;
     return melhorQuebra;
 }; /* IMPLEMENTAR */
 void Ordenador::suffleVector(int numShuffle){
+    srand48(this->seed);
+
     int p1 = 0, p2 = 0, temp;
     for (int t = 0; t < numShuffle; t++) {
         /* Gera dois índices distintos no intervalo [0..size-1] */
@@ -286,4 +294,8 @@ int Ordenador::calculaQuebras(){
 
 void Ordenador::calculaCusto(){
     this->custo = (constantes[0] * estatisticas[1]) + (constantes[1] * estatisticas[2]) + (constantes[2] * estatisticas[3]);
+}
+
+void Ordenador::definirSeed(int seed){
+    this->seed = seed;
 }
