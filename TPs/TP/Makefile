@@ -12,7 +12,7 @@ BIN_DIR = bin
 INC_DIR = include
 
 # Nome do executável
-TARGET = $(BIN_DIR)/tp.out
+TARGET = $(BIN_DIR)/tp1.out
 
 # Arquivos fonte
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
