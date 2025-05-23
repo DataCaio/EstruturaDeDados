@@ -42,10 +42,6 @@ int main(int argc, char* argv[]) {
 
     double constantes[3] = {a,b,c};
 
-    for(int i=0;i<3;i++){
-        std::cout << constantes[i]<< std::endl;
-    }
-
     Ordenador ordenador(vet,vet.tamanhoAtual(),0,0,constantes);
 
     std::cout << "size " << tam
@@ -56,6 +52,7 @@ int main(int argc, char* argv[]) {
     int limiarParticao = ordenador.determinaLimiarParticao(limiarCusto);
     int limiarQuebras = ordenador.determinaLimiarQuebras(limiarCusto,limiarParticao);
     
+    Ordenador ideal(vet,vet.tamanhoAtual(),limiarParticao,limiarQuebras,constantes);
     std::cout << std::endl;
 
     return 0;

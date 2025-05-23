@@ -1,2 +1,5 @@
 .vscode/*
 *.json
+*.o
+bin/*
+/tst2.txt
