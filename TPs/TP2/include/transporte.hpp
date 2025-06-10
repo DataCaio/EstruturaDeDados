@@ -1,17 +1,18 @@
 #ifndef TRANSPORTE_H
 #define TRANSPORTE_H
 
+#include "grafo.hpp"
 #include "armazem.hpp"
 #include <iostream>
 
-class Transporte{
+class Transporte {
     private:
-        Armazem* entrada;
-        Armazem* saída;
-        int tempo;
-        int capacidade;
+        Grafo transportes;
     public:
+        Transporte(int numRotas);
         
+        void adicionaRotas();
+        void exibirRotas();
 
 };
 

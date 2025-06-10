@@ -1,10 +1,11 @@
 #ifndef ESCALONADOR_H
 #define ESCALONADOR_H
 #include "minHeap.hpp"
+#include "string"
 
 class Escalonador : public Heap{
     private:
-        int* tempo;
+        std::string tempoAtual;
     public:
         Escalonador(int &tempo);
         void inicializa();

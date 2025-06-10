@@ -1,5 +1,6 @@
 #include "grafo.hpp"
 #include "armazem.hpp"
+#include "transporte.hpp"
 #include <iostream>
 
 int main(){
@@ -11,8 +12,8 @@ int main(){
     std::cin >> custoRemocao;
     std::cin >> numeroArmzaens;
     
-    Grafo armazens(numeroArmzaens);
-    armazens.lerMatriz();
+    Transporte rotas(numeroArmzaens);
+    rotas.adicionaRotas();
 
     std::cin >> numeroPacotes;
     Pacote pacotes[numeroPacotes];
