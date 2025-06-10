@@ -6,8 +6,8 @@
 
 class Transporte{
     private:
-        Armazem entrada;
-        Armazem saída;
+        Armazem* entrada;
+        Armazem* saída;
         int tempo;
         int capacidade;
     public:

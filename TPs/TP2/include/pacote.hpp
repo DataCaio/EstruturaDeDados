@@ -5,12 +5,18 @@
 class Pacote{
     private:
         int chave;
-        int alteracoes;
+        int alteracoes; /*!!*/
         std::string estado;
+
+        int origem;
+        int destino;
+
         int tempoArmazenado;
         int tempoTransportado;
+        int tempoChegada;
 
     public:
+        Pacote(int tempoChegada,int chave,int origem, int destino);
         Pacote();
         ~Pacote();    
 
