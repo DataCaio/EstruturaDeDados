@@ -1,16 +1,23 @@
 #ifndef ESCALONADOR_H
 #define ESCALONADOR_H
 #include "minHeap.hpp"
+#include "evento.hpp"
 
-class Escalonador : public Heap{
+
+class Escalonador{
     private:
-        int* tempo;
+        int tempoAtual;
+        Heap eventos;
+
     public:
-        Escalonador(int &tempo);
+        Escalonador();
         void inicializa();
-        void insereEvento();
-        void retiraEvento(); /* possivel troca de tipo */
+        void insereEvento(Evento evento);
+        Evento retiraEvento(); /* possivel troca de tipo */
         void finaliza();
+
+        void AtualizaEstatisticas();
+        void MostraEstatisticas();
 
 };
 

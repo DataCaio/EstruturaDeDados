@@ -1,18 +1,21 @@
 #ifndef TRANSPORTE_H
 #define TRANSPORTE_H
 
-#include "armazem.hpp"
+#include "grafo.hpp"
+#include "escalonador.hpp"
+
 #include <iostream>
 
-class Transporte{
+class Transporte {
     private:
-        Armazem* entrada;
-        Armazem* saída;
-        int tempo;
-        int capacidade;
+        Grafo rotas;
     public:
+        Transporte(int numVertices);
         
+        void adicionaRotas();
+        void exibirRotas();
 
+        void agendarTransportesIniciais(Escalonador& escalonador, int intervalo);
 };
 
 #endif

@@ -3,10 +3,11 @@
 
 class Tempo{
     private:
-        int tempo
+        int tempoAtual;
     public:
         Tempo();
-        void setTempo()
+        void setTempo();
+        void acrescentaTempo();
 };
 
 #endif

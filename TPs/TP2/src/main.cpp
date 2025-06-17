@@ -1,18 +1,20 @@
 #include "grafo.hpp"
 #include "armazem.hpp"
+#include "transporte.hpp"
+#include "escalonador.hpp"
 #include <iostream>
 
 int main(){
-    int capacidade, latencia,intervalo,custoRemocao,numeroArmzaens,numeroPacotes;
+    int capacidade, latencia,intervalo,custoRemocao,numeroArmazens,numeroPacotes;
 
     std::cin >> capacidade;
     std::cin >> latencia;
     std::cin >> intervalo;
     std::cin >> custoRemocao;
-    std::cin >> numeroArmzaens;
+    std::cin >> numeroArmazens;
     
-    Grafo armazens(numeroArmzaens);
-    armazens.lerMatriz();
+    Transporte transporte(numeroArmazens);
+    transporte.adicionaRotas(); // Lê a matriz para o grafo
 
     std::cin >> numeroPacotes;
     Pacote pacotes[numeroPacotes];
@@ -27,6 +29,9 @@ int main(){
         Pacote pacote(tempoChegada,chave,origem,destino);
         pacotes[i] = pacote;
     }
-
+    
+    Escalonador escalonador;
+    transporte.agendarTransportesIniciais(escalonador, intervalo);
+    
 
 }
