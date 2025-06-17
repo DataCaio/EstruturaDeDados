@@ -6,6 +6,7 @@ class Evento{
         int tempo;
         int tipoEvento; /*1 caso pacote, 2 caso transporte*/
     public:
+        Evento(int tempo, int tipoEvento,);
         
 };
 

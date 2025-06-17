@@ -2,18 +2,20 @@
 #define TRANSPORTE_H
 
 #include "grafo.hpp"
-#include "armazem.hpp"
+#include "escalonador.hpp"
+
 #include <iostream>
 
 class Transporte {
     private:
-        Grafo transportes;
+        Grafo rotas;
     public:
-        Transporte(int numRotas);
+        Transporte(int numVertices);
         
         void adicionaRotas();
         void exibirRotas();
 
+        void agendarTransportesIniciais(Escalonador& escalonador, int intervalo);
 };
 
 #endif

@@ -1,5 +1,10 @@
 #ifndef PACOTE_H
 #define PACOTE_H
+
+#include "lista.hpp"
+#include "grafo.hpp"
+#include "fila.hpp"
+
 #include <string>
 
 class Pacote{
@@ -10,6 +15,8 @@ class Pacote{
 
         int origem;
         int destino;
+        ListaEncadeada rota; // <-- ADICIONE ESTA LINHA
+        No* posicao_atual_na_rota; // <-- ADICIONE ESTA LINHA
 
         int tempoArmazenado;
         int tempoTransportado;
@@ -19,8 +26,15 @@ class Pacote{
         Pacote(int tempoChegada,int chave,int origem, int destino);
         Pacote();
         ~Pacote();    
-
+        
+        void calcularMinhaRota(Grafo& grafo); // <-- ADICIONE ESTE MÉTODO
+        void avancarRota(); // <-- ADICIONE ESTA LINHA
+        No* getPosicaoAtual(); // <-- ADICIONE ESTA LINHA
+    
+        // Método para obter o próximo destino na rota
+        int getProximoDestino();
         int getChave();
+        
         void setChave(int chave);
 
         void acrescentaTempoArmzenado(int tempo);

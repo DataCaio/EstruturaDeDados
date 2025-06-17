@@ -22,6 +22,13 @@ public:
             std::cout << "\n";
         }
     }
+    int* operator[](int i) {
+        return matriz[i];
+    }
+
+    int getNumVertices(){
+        return this ->numVertices;
+    }
 };
 
 
