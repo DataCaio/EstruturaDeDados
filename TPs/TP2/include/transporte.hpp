@@ -16,6 +16,8 @@ class Transporte {
         void exibirRotas();
 
         void agendarTransportesIniciais(Escalonador& escalonador, int intervalo);
+
+        
 };
 
 #endif

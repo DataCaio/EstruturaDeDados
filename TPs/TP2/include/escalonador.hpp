@@ -2,6 +2,8 @@
 #define ESCALONADOR_H
 #include "minHeap.hpp"
 #include "evento.hpp"
+#include "transporte.hpp"
+#include "pacote.hpp"
 
 
 class Escalonador{
@@ -11,7 +13,9 @@ class Escalonador{
 
     public:
         Escalonador();
-        void inicializa();
+        void inicializa(Pacote* pacotes, int numPacotes, Armazem* armazens,
+            int numArmazens, Transporte& transporte, 
+            int latencia, int intervalo, int capacidade);
         void insereEvento(Evento evento);
         Evento retiraEvento(); /* possivel troca de tipo */
         void finaliza();
