@@ -25,6 +25,7 @@ private:
 public:
     Pacote();
     Pacote(int tempoChegada, int chave, int origem, int destino);
+     Pacote(const Pacote& outro);
     ~Pacote();
 
     // Métodos de Rota
@@ -39,6 +40,10 @@ public:
     void setChave(int ch);
     void alteraEstado(std::string novoEstado);
     std::string getEstado() const;
+
+    int getTempoChegada(){
+        return this->tempoChegada;
+    }
 };
 
 #endif

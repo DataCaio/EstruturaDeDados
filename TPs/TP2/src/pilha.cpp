@@ -19,7 +19,7 @@ void Pilha::Empilha(Celula* celula){
 
 Pacote Pilha::Desempilha(){
     if(this->vazia || this->topo == nullptr){
-        return;
+        return Pacote();
     }
     Celula* velhoTopo = this->topo;
     this->topo = this->topo->prox;
@@ -36,4 +36,8 @@ void Pilha::limpa(){
     while (!this->vazia){
         Desempilha();
     }
+}
+
+bool Pilha::Vazia() {
+    return  this->vazia;
 }

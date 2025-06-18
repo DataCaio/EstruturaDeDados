@@ -1,5 +1,10 @@
 #include "grafo.hpp"
 #include <iostream>
+#include <fstream> 
+
+int* Grafo::operator[](int i){
+    return this->matriz[i];
+}
 
 Grafo::Grafo(int vertices){
     this->numVertices = vertices;
@@ -17,10 +22,11 @@ Grafo::~Grafo() {
     delete[] matriz;
 }
 
-void Grafo::lerMatriz() {
+
+void Grafo::lerMatriz(std::ifstream& arquivo) {
     for (int i = 0; i < this->numVertices; ++i) {
         for (int j = 0; j < this->numVertices; ++j) {
-            std::cin >> matriz[i][j];
+            arquivo >> matriz[i][j];
         }
     }
 }

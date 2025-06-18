@@ -18,12 +18,14 @@ private:
 
 public:
     ListaEncadeada();
+    ListaEncadeada(const ListaEncadeada& outra);
     ~ListaEncadeada(); // Destrutor para limpar a memória
 
     void insereNoInicio(int id_armazem);
     void exibir();
     
-    No* getCabeca(); // Getter para a cabeça da lista
+    No* getCabeca() const; // Getter para a cabeça da lista
+
 };
 
 #endif

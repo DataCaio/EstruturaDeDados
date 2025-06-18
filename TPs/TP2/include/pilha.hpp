@@ -16,7 +16,7 @@ class Pilha{
         void Empilha(Celula *celula);
         Pacote Desempilha();
         void limpa();
-
+        bool Vazia();
     
 };
 

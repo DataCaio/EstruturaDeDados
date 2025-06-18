@@ -10,9 +10,10 @@ Transporte::Transporte(int numVertices) : rotas(numVertices) {
 
 // Método para ler a matriz de adjacência do grafo interno.
 // Ele simplesmente "repasa" a chamada para o objeto Grafo.
-void Transporte::adicionaRotas() {
-    this->rotas.lerMatriz();
+void Transporte::adicionaRotas(std::ifstream& arquivo) {
+    this->rotas.lerMatriz(arquivo);
 }
+
 // Método principal que inicializa os eventos de transporte da simulação.
 void Transporte::agendarTransportesIniciais(Escalonador& escalonador, int intervalo) {
     // Pega o número de armazéns a partir do grafo interno.

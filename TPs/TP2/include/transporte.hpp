@@ -2,9 +2,11 @@
 #define TRANSPORTE_H
 
 #include "grafo.hpp"
-#include "escalonador.hpp"
+/* #include "escalonador.hpp" */
 
 #include <iostream>
+#include <fstream>
+class Escalonador;
 
 class Transporte {
 private:
@@ -12,7 +14,7 @@ private:
 public:
     Transporte(int numVertices);
     
-    void adicionaRotas();
+    void adicionaRotas(std::ifstream& arquivo);
     void exibirRotas();
     void agendarTransportesIniciais(Escalonador& escalonador, int intervalo);
 
