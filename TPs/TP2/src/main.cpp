@@ -18,11 +18,13 @@ int main(){
 
 
     // Cria o Escalonador. SÓ EXISTE UM para toda a simulação.
-    Escalonador escalonador;
-    // Inicializa o relógio e o estado do escalonador. Essencial!
+    Escalonador escalonador;// Inicializa o relógio e o estado do escalonador. Essencial!
+    
+    Armazem* armazens = new Armazem[numeroArmazens]; 
 
     std::cin >> numeroPacotes;
-    Pacote pacotes[numeroPacotes];
+    Pacote* pacotes = new Pacote[numeroPacotes];
+    
     for(int i=0;i<numeroPacotes;i++){
         int tempoChegada,chave,origem,destino;
         std::string pac,org,dst;
