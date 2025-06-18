@@ -1,52 +1,44 @@
 #ifndef PACOTE_H
 #define PACOTE_H
 
+#include <string>
 #include "lista.hpp"
 #include "grafo.hpp"
 #include "fila.hpp"
 
-#include <string>
+class Pacote {
+private:
+    int chave;
+    std::string estado;
+    int origem;
+    int destino;
+    int tempoChegada;
 
-class Pacote{
-    private:
-        int chave;
-        int alteracoes; /*!!*/
-        std::string estado;
+    // Rota e posição na rota
+    ListaEncadeada rota;
+    No* posicao_atual_na_rota;
 
-        int origem;
-        int destino;
-        ListaEncadeada rota; // <-- ADICIONE ESTA LINHA
-        No* posicao_atual_na_rota; // <-- ADICIONE ESTA LINHA
+    // Estatísticas
+    int tempoArmazenado;
+    int tempoTransportado;
 
-        int tempoArmazenado;
-        int tempoTransportado;
-        int tempoChegada;
+public:
+    Pacote();
+    Pacote(int tempoChegada, int chave, int origem, int destino);
+    ~Pacote();
 
-    public:
-        Pacote(int tempoChegada,int chave,int origem, int destino);
-        Pacote();
-        ~Pacote();    
-        
-        void calcularMinhaRota(Grafo& grafo); // <-- ADICIONE ESTE MÉTODO
-        void avancarRota(); // <-- ADICIONE ESTA LINHA
-        No* getPosicaoAtual(); // <-- ADICIONE ESTA LINHA
-    
-        // Método para obter o próximo destino na rota
-        int getProximoDestino();
-        int getChave();
-        
-        void setChave(int chave);
+    // Métodos de Rota
+    void calcularMinhaRota(Grafo& grafo);
+    void avancarRota();
+    No* getPosicaoAtual() const;
+    int getProximoDestinoNaRota() const;
+    int getDestinoFinal() const;
 
-        void acrescentaTempoArmzenado(int tempo);
-        int getTempoArmazenado();
-
-        void acrescentaTempoTransportado(int tempo);
-        int getTempoTransportado();
-
-        void alteraEstado(std::string novoEstado);
-        std::string getEstado();
-        
-    friend class pilha;
+    // Getters e Setters de Estado/Info
+    int getChave() const;
+    void setChave(int ch);
+    void alteraEstado(std::string novoEstado);
+    std::string getEstado() const;
 };
 
 #endif

@@ -7,17 +7,18 @@
 #include <iostream>
 
 class Transporte {
-    private:
-        Grafo rotas;
-    public:
-        Transporte(int numVertices);
-        
-        void adicionaRotas();
-        void exibirRotas();
+private:
+    Grafo rotas;
+public:
+    Transporte(int numVertices);
+    
+    void adicionaRotas();
+    void exibirRotas();
+    void agendarTransportesIniciais(Escalonador& escalonador, int intervalo);
 
-        void agendarTransportesIniciais(Escalonador& escalonador, int intervalo);
-
-        
+    Grafo& getGrafo() {
+        return rotas;
+    }
 };
 
 #endif

@@ -4,6 +4,7 @@
 #include "evento.hpp"
 #include "transporte.hpp"
 #include "pacote.hpp"
+#include "armazem.hpp" 
 
 
 class Escalonador{

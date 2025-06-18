@@ -1,35 +1,25 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-class Grafo{
+#include <iostream>
+
+class Grafo {
 private:
     int** matriz;
     int numVertices;
 
 public:
     Grafo(int vertices);
-
     ~Grafo();
 
+    int* operator[](int i); // Supondo que você manteve a sobrecarga
     void lerMatriz();
 
-    void exibir() {
-        std::cout << "\nMatriz de Adjacência:\n";
-        for (int i = 0; i < numVertices; ++i) {
-            for (int j = 0; j < numVertices; ++j) {
-                std::cout << matriz[i][j] << " ";
-            }
-            std::cout << "\n";
-        }
-    }
-    int* operator[](int i) {
-        return matriz[i];
-    }
-
-    int getNumVertices(){
-        return this ->numVertices;
+    // --- CORREÇÃO ADICIONADA AQUI ---
+    // Permite que outras classes consultem o número de vértices de forma segura.
+    int getNumVertices() const {
+        return numVertices;
     }
 };
-
 
 #endif

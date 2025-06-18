@@ -4,6 +4,7 @@
 class Heap{
 
     public:
+        Heap();
         Heap(int maxsize);
         ~Heap();
 

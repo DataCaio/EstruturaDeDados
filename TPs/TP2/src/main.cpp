@@ -36,7 +36,7 @@ int main(){
         pacotes[i] = Pacote(tempoChegada,chave,origem,destino);
         
         pacotes[i].calcularMinhaRota(transporte.getGrafo());
-        Evento chegadaPacote(tempoChegada, 1, chave);
+        Evento chegadaPacote(tempoChegada, 1, chave, origem);
         escalonador.insereEvento(chegadaPacote);
     }
 

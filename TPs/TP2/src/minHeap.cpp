@@ -1,5 +1,10 @@
 #include "minHeap.hpp"
 #include <iostream>
+Heap::Heap(){
+    this->tamanho = 0;
+}
+
+
 Heap::Heap(int maxsize){
     tamanho = 0;
     data = new int[maxsize];

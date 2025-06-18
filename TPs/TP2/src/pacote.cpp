@@ -48,6 +48,38 @@ void Pacote::calcularMinhaRota(Grafo& grafo) {
     this->posicao_atual_na_rota = this->rota.getCabeca();
 }
 
-No* Pacote::getPosicaoAtual() {
+No* Pacote::getPosicaoAtual() const {
     return posicao_atual_na_rota;
+}
+
+int Pacote::getChave() const {
+    return chave;
+}
+
+void Pacote::setChave(int ch){
+    this->chave = ch;
+}
+
+int Pacote::getDestinoFinal() const {
+    return destino;
+}
+
+// Este método é CRUCIAL para a lógica de armazenamento.
+// Ele diz para qual seção do armazém o pacote deve ir.
+int Pacote::getProximoDestinoNaRota() const {
+    // Verifica se estamos em um ponto válido da rota E se existe um próximo nó.
+    if (posicao_atual_na_rota != nullptr && posicao_atual_na_rota->proximo != nullptr) {
+        // Retorna o ID do armazém do próximo nó.
+        return posicao_atual_na_rota->proximo->id_armazem;
+    }
+    // Se não há próximo destino, retorna um valor inválido.
+    return -1; 
+}
+
+void Pacote::alteraEstado(std::string novoEstado) {
+    this->estado = novoEstado;
+}
+
+std::string Pacote::getEstado() const {
+    return estado;
 }
