@@ -55,34 +55,36 @@ int Heap::GetAncestral(int posicao) { return (posicao - 1) / 2; }
 int Heap::GetSucessorEsq(int posicao) { return (posicao * 2) + 1; }
 int Heap::GetSucessorDir(int posicao) { return (posicao * 2) + 2; }
 
+// Em Heap::HeapifyPorCima
 void Heap::HeapifyPorCima(int posicao) {
     if (posicao <= 0) return;
     
     int pai = GetAncestral(posicao);
-    // <-- MUDANÇA: Comparamos os tempos dos eventos, não os objetos inteiros.
-    if (data[posicao].getTempo() < data[pai].getTempo()) {
+    // MUDANÇA: use o operador< sobrecarregado
+    if (data[posicao] < data[pai]) {
         std::swap(data[posicao], data[pai]);
-        HeapifyPorCima(pai); // Chamada recursiva ou laço while
+        HeapifyPorCima(pai);
     }
 }
 
+// Em Heap::HeapifyPorBaixo
 void Heap::HeapifyPorBaixo(int posicao) {
     int esq = GetSucessorEsq(posicao);
     int dir = GetSucessorDir(posicao);
     int menor = posicao;
 
-    // <-- MUDANÇA: Compara o tempo do filho esquerdo com o tempo do menor atual.
-    if (esq < tamanho && data[esq].getTempo() < data[menor].getTempo()) {
+    // MUDANÇA: use o operador< sobrecarregado
+    if (esq < tamanho && data[esq] < data[menor]) {
         menor = esq;
     }
     
-    // <-- MUDANÇA: Compara o tempo do filho direito com o tempo do menor atual.
-    if (dir < tamanho && data[dir].getTempo() < data[menor].getTempo()) {
+    // MUDANÇA: use o operador< sobrecarregado
+    if (dir < tamanho && data[dir] < data[menor]) {
         menor = dir;
     }
 
     if (menor != posicao) {
         std::swap(data[posicao], data[menor]);
-        HeapifyPorBaixo(menor); // Chamada recursiva ou laço while
+        HeapifyPorBaixo(menor);
     }
 }

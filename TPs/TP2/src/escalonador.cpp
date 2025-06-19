@@ -23,62 +23,63 @@ void Escalonador::inicializa(Pacote* pacotes, int numPacotes, Armazem* armazens,
         this->tempoAtual = proximo_evento.getTempo();
 
         // Se evento é transporte
-        // Substitua o bloco 'if (proximo_evento.getTipo() == 2)' por este:
+                // Substitua o bloco 'if (proximo_evento.getTipo() == 2)' por este:
         if (proximo_evento.getTipo() == 2) {
-        int origem = proximo_evento.getOrigemTransporte();
-        int destino = proximo_evento.getDestinoTransporte();
+            int origem = proximo_evento.getOrigemTransporte();
+            int destino = proximo_evento.getDestinoTransporte();
 
-        // Inicia o tempo de partida com o tempo do evento atual
-        int tempo_partida = this->tempoAtual;
+            if (armazens[origem].temPacotesPara(destino)) {
+                Pilha pilha_temp;
 
-        if (armazens[origem].temPacotesPara(destino)) {
-            Pilha pilha_temp;
+                // Avança o tempo global para o momento em que a PRIMEIRA remoção TERMINA.
+                // Isso efetivamente cria o "custo de acesso" de 1 unidade de tempo.
+                this->tempoAtual += custoRemocao;
 
-            // >>> A CORREÇÃO FINAL ESTÁ AQUI <<<
-            // Aplica um "custo de acesso" inicial para começar o processo de remoção.
-            // Isso alinha os tempos com o arquivo de saída de exemplo.
-            tempo_partida += custoRemocao;
+                // 1. Esvazia a seção, registrando os tempos corretos
+                while (true) {
+                    Pacote pacote_removido = armazens[origem].recupera(destino);
+                    printf("%07d pacote %03d removido de %03d na secao %03d\n", this->tempoAtual, pacote_removido.getChave(), origem, destino);
+                    pilha_temp.Empilha(new Celula(pacote_removido));
 
-            // 1. Esvaziar a seção...
-            while (armazens[origem].temPacotesPara(destino)) {
-                Pacote pacote_removido = armazens[origem].recupera(destino);
-                
-                // O tempo do evento de remoção é o tempo atual da partida.
-                printf("%07d pacote %03d removido de %03d na secao %03d\n", tempo_partida, pacote_removido.getChave(), origem, destino);
-                pilha_temp.Empilha(new Celula(pacote_removido));
+                    if (!armazens[origem].temPacotesPara(destino)) {
+                        break; // Sai do loop se a seção estiver vazia
+                    }
+                    
+                    // Incrementa o tempo para a PRÓXIMA remoção
+                    this->tempoAtual += custoRemocao;
+                }
 
-                // Se ainda houver pacotes, o tempo para a *próxima* remoção aumenta.
-                if (armazens[origem].temPacotesPara(destino)) {
-                    tempo_partida += custoRemocao;
+                // Neste ponto, `this->tempoAtual` contém o tempo exato de partida do transporte.
+                int tempo_partida = this->tempoAtual;
+
+                // 2. Transportar pacotes da pilha temporária
+                int pacotes_transportados = 0;
+                while (!pilha_temp.Vazia() && pacotes_transportados < capacidade) {
+                    Pacote pacote_a_transportar = pilha_temp.Desempilha();
+                    pacotes_transportados++;
+
+                    printf("%07d pacote %03d em transito de %03d para %03d\n", tempo_partida, pacote_a_transportar.getChave(), origem, destino);
+                    
+                    int tempo_chegada_destino = tempo_partida + latencia;
+                    Evento evento_chegada(tempo_chegada_destino, 1, pacote_a_transportar.getChave(), destino);
+                    this->insereEvento(evento_chegada);
+                }
+
+                // 3. Rearmazenar os pacotes excedentes
+                while (!pilha_temp.Vazia()) {
+                    Pacote pacote_a_rearmazenar = pilha_temp.Desempilha();
+                    armazens[origem].armazena(pacote_a_rearmazenar, destino);
+                    printf("%07d pacote %03d rearmazenado em %03d na secao %03d\n", tempo_partida, pacote_a_rearmazenar.getChave(), origem, destino);
                 }
             }
+            
+                // Agenda o próximo evento de transporte relativo ao tempo de TÉRMINO desta operação
+                int tempo_proximo_transporte = this->tempoAtual + intervalo;
+                Evento proximo_transporte(tempo_proximo_transporte, 2, origem, destino);
+                this->insereEvento(proximo_transporte);
 
-            // 2. Transportar pacotes...
-            int pacotes_transportados = 0;
-            while (!pilha_temp.Vazia() && pacotes_transportados < capacidade) {
-                Pacote pacote_a_transportar = pilha_temp.Desempilha();
-                pacotes_transportados++;
-
-                printf("%07d pacote %03d em transito de %03d para %03d\n", tempo_partida, pacote_a_transportar.getChave(), origem, destino);
-                
-                int tempo_chegada_destino = tempo_partida + latencia;
-                Evento evento_chegada(tempo_chegada_destino, 1, pacote_a_transportar.getChave(), destino);
-                this->insereEvento(evento_chegada);
             }
-
-            // 3. Rearmazenar...
-            while (!pilha_temp.Vazia()) {
-                Pacote pacote_a_rearmazenar = pilha_temp.Desempilha();
-                armazens[origem].armazena(pacote_a_rearmazenar, destino);
-                printf("%07d pacote %03d rearmazenado em %03d na secao %03d\n", tempo_partida, pacote_a_rearmazenar.getChave(), origem, destino);
-            }
-        }
         
-        // Agenda o próximo evento de transporte relativo ao tempo de TÉRMINO desta operação.
-        int tempo_proximo_transporte = tempo_partida + intervalo;
-        Evento proximo_transporte(tempo_proximo_transporte, 2, origem, destino);
-        this->insereEvento(proximo_transporte);
-    }
         // Se evento é chegada de pacotes
         else if (proximo_evento.getTipo() == 1) {
             

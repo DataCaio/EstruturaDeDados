@@ -6,6 +6,30 @@ Evento::Evento() {
     this->tempo = -1;
     this->tipoEvento = -1;
 }
+bool Evento::operator<(const Evento& outro) const {
+    if (this->tempo != outro.tempo) {
+        return this->tempo < outro.tempo;
+    }
+
+    // O tempo é igual, vamos desempatar pela origem (ou ID do pacote)
+    int local_a = (this->tipoEvento == 1) ? this->dados.id_pacote : this->dados.local;
+    int local_b = (outro.tipoEvento == 1) ? outro.dados.id_pacote : outro.dados.local;
+
+    if (local_a != local_b) {
+        return local_a < local_b;
+    }
+
+    // Se ainda empatar, desempata pelo destino (ou local de chegada do pacote)
+    int destino_a = (this->tipoEvento == 1) ? this->dados.local : this->dados.destino;
+    int destino_b = (outro.tipoEvento == 1) ? outro.dados.local : outro.dados.destino;
+
+    if (destino_a != destino_b) {
+        return destino_a < destino_b;
+    }
+
+    // Como último recurso, desempata pelo tipo do evento
+    return this->tipoEvento < outro.tipoEvento;
+}
 
 // O NOVO CONSTRUTOR UNIVERSAL
 Evento::Evento(int tempo, int tipo, int arg1, int arg2) {

@@ -17,7 +17,7 @@ public:
     Evento(); 
 
     Evento(int tempo, int tipo, int arg1, int arg2);
-
+    bool operator<(const Evento& outro) const;
     // Getters
     int getTempo() const;
     int getTipo() const;
