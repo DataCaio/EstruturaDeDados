@@ -3,20 +3,23 @@
 
 Escalonador::Escalonador() : eventos() { // Chama o construtor padrão de Heap
     this->tempoAtual = 0;
+    this->numPacotesEntregues = 0;
+    this->totalPacotes = 0;
+    this->tempoTotalEmSistema = 0.0;
+    this->tempoFinalSimulacao = 0;
 }
 
 // O NOVO CONSTRUTOR COM A SOLUÇÃO CORRETA
 Escalonador::Escalonador(int capacidade) : eventos(capacidade) { // <-- A MÁGICA ACONTECE AQUI
-    // A sintaxe ': eventos(capacidade)' diz ao C++:
-    // "Antes de executar o código deste construtor, por favor,
-    // construa o membro 'eventos' usando o construtor de Heap que aceita um int,
-    // e passe 'capacidade' para ele."
-
-    // Agora, podemos inicializar os outros membros no corpo.
     this->tempoAtual = 0;
+    this->totalPacotes = 0;
+    this->numPacotesEntregues = 0;
+    this->tempoTotalEmSistema = 0.0;
+    this->tempoFinalSimulacao = 0;
 }
 
 void Escalonador::inicializa(Pacote* pacotes, int numPacotes, Armazem* armazens, int numArmazens, Transporte& transporte, int latencia, int intervalo, int capacidade, int custoRemocao) {
+    this->totalPacotes = numPacotes;
     while (!this->eventos.Vazio()) {
         
         Evento proximo_evento = this->retiraEvento();
@@ -79,11 +82,12 @@ void Escalonador::inicializa(Pacote* pacotes, int numPacotes, Armazem* armazens,
                 }
 
                 // 3. Agenda o próximo evento de transporte relativo ao tempo da PRIMEIRA remoção
-                int tempo_proximo_transporte = tempo_primeira_remocao + intervalo;
+                // Em TP2/src/escalonador.cpp
+                int tempo_proximo_transporte = tempo_evento_atual + intervalo;          
                 Evento proximo_transporte(tempo_proximo_transporte, 2, origem, destino);
                 this->insereEvento(proximo_transporte);
 
-            } else {
+            } else if (this->numPacotesEntregues < this->totalPacotes){
                 // Se não há pacotes para transportar, apenas reagende o próximo evento para esta rota
                 int tempo_proximo_transporte = tempo_evento_atual + intervalo;
                 Evento proximo_transporte(tempo_proximo_transporte, 2, origem, destino);
@@ -151,13 +155,15 @@ void Escalonador::finaliza() {
 void Escalonador::AtualizaEstatisticas(Pacote& pacote_entregue) {
     this->numPacotesEntregues++;
     
-    // Calcula o tempo total de vida do pacote (tempo atual - tempo de postagem)
     int tempoDeVida = this->tempoAtual - pacote_entregue.getTempoChegada();
     this->tempoTotalEmSistema += tempoDeVida;
+
+    // A cada entrega, guardamos o tempo atual como o tempo "oficial" de fim.
+    this->tempoFinalSimulacao = this->tempoAtual;
 }
 void Escalonador::MostraEstatisticas() {
     std::cout << "--- ESTATISTICAS FINAIS ---" << std::endl;
-    std::cout << "Tempo total da simulacao: " << this->tempoAtual << std::endl;
+    std::cout << "Tempo total da simulacao: " << this->tempoFinalSimulacao << std::endl;
     std::cout << "Numero de pacotes entregues: " << this->numPacotesEntregues << std::endl;
     
     if (numPacotesEntregues > 0) {
