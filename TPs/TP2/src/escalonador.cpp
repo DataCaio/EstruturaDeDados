@@ -25,75 +25,71 @@ void Escalonador::inicializa(Pacote* pacotes, int numPacotes, Armazem* armazens,
         Evento proximo_evento = this->retiraEvento();
         this->tempoAtual = proximo_evento.getTempo();
 
-        // Em src/escalonador.cpp
-
-        // Substitua todo o bloco if (proximo_evento.getTipo() == 2) { ... } por este:
-        if (proximo_evento.getTipo() == 2) {
+        if (proximo_evento.getTipo() == 2) { // Evento de Transporte
             int origem = proximo_evento.getOrigemTransporte();
             int destino = proximo_evento.getDestinoTransporte();
-            int tempo_evento_atual = this->tempoAtual; // Salva o tempo original do evento (ex: 100)
+            int tempo_inicio_evento = this->tempoAtual;
 
             if (armazens[origem].temPacotesPara(destino)) {
-                Pilha pilha_temp;
-                int tempo_operacao = tempo_evento_atual;
-                int tempo_primeira_remocao = -1;
+                                // --- INÍCIO DA LÓGICA ADAPTADA DO CÓDIGO FUNCIONAL ---
 
-                // 1. Esvazia a seção, registrando os tempos corretos
-                // A lógica da saída esperada indica um custo duplo para o primeiro pacote.
-                // Simulamos isso incrementando o tempo antes e dentro do loop.
-                tempo_operacao += custoRemocao; // Custo de "acesso" à seção
-
-                while (armazens[origem].temPacotesPara(destino)) {
-                    tempo_operacao += custoRemocao; // Custo de remoção do pacote atual
-
-                    if (tempo_primeira_remocao == -1) {
-                        tempo_primeira_remocao = tempo_operacao; // Registra o tempo de conclusão da primeira remoção
+                // 1. Descarrega a seção em uma pilha auxiliar.
+                // Isso inverte a ordem, resultando em uma ordem FIFO (pacote mais antigo no topo).
+                Pilha pilha_auxiliar_fifo;
+                {
+                    Pilha pilha_temp_lifo;
+                    // Primeiro, obtemos os pacotes na ordem LIFO original
+                    while (armazens[origem].temPacotesPara(destino)) {
+                        pilha_temp_lifo.Empilha(new Celula(armazens[origem].recupera(destino)));
                     }
-
-                    Pacote pacote_removido = armazens[origem].recupera(destino);
-                    printf("%07d pacote %03d removido de %03d na secao %03d\n", tempo_operacao, pacote_removido.getChave(), origem, destino);
-                    pilha_temp.Empilha(new Celula(pacote_removido));
+                    
+                    // Imprime os eventos de remoção, avançando o relógio a cada passo
+                    while(!pilha_temp_lifo.Vazia()){
+                        Pacote p = pilha_temp_lifo.Desempilha();
+                        
+                        // O relógio da simulação avança AQUI
+                        this->tempoAtual += custoRemocao;
+                        
+                        printf("%07d pacote %03d removido de %03d na secao %03d\n", this->tempoAtual, p.getChave(), origem, destino);
+                        
+                        // Empilha na auxiliar para processamento FIFO
+                        pilha_auxiliar_fifo.Empilha(new Celula(p));
+                    }
                 }
-
-                // O tempo de partida é o momento em que a última remoção foi concluída.
-                int tempo_partida = tempo_operacao;
-                this->tempoAtual = tempo_partida; // Atualiza o relógio global
-
-                // 2. Transportar pacotes da pilha temporária e re-armazenar excedentes
+                
+                // 2. Processa transporte/rearmazenamento da pilha auxiliar (que está em ordem FIFO)
                 int pacotes_transportados = 0;
-                Pilha pilha_rearmazenar;
+                while (!pilha_auxiliar_fifo.Vazia()) {
+                    // Desempilha o pacote mais antigo primeiro
+                    Pacote p = pilha_auxiliar_fifo.Desempilha();
 
-                while (!pilha_temp.Vazia()) {
                     if (pacotes_transportados < capacidade) {
-                        Pacote p = pilha_temp.Desempilha();
-                        printf("%07d pacote %03d em transito de %03d para %03d\n", tempo_partida, p.getChave(), origem, destino);
-                        Evento evento_chegada(tempo_partida + latencia, 1, p.getChave(), destino);
-                        this->insereEvento(evento_chegada);
+                        // Pacote vai para o transporte
+                        printf("%07d pacote %03d em transito de %03d para %03d\n", this->tempoAtual, p.getChave(), origem, destino);
+                        
+                        Evento chegada_pacote(this->tempoAtual + latencia, 1, p.getChave(), destino);
+                        this->insereEvento(chegada_pacote);
                         pacotes_transportados++;
                     } else {
-                        pilha_rearmazenar.Empilha(new Celula(pilha_temp.Desempilha()));
+                        // Pacote é rearmazenado
+                        printf("%07d pacote %03d rearmazenado em %03d na secao %03d\n", this->tempoAtual, p.getChave(), origem, destino);
+                        armazens[origem].armazena(p, destino);
                     }
                 }
 
-                while(!pilha_rearmazenar.Vazia()){
-                    Pacote p = pilha_rearmazenar.Desempilha();
-                    armazens[origem].armazena(p, destino);
-                    printf("%07d pacote %03d rearmazenado em %03d na secao %03d\n", tempo_partida, p.getChave(), origem, destino);
-                }
-
-                // 3. Agenda o próximo evento de transporte relativo ao tempo da PRIMEIRA remoção
-                // Em TP2/src/escalonador.cpp
-                int tempo_proximo_transporte = tempo_evento_atual + intervalo;          
-                Evento proximo_transporte(tempo_proximo_transporte, 2, origem, destino);
+                // 3. Reagenda o próximo transporte usando o tempo de INÍCIO do evento atual
+                Evento proximo_transporte(tempo_inicio_evento + intervalo, 2, origem, destino);
                 this->insereEvento(proximo_transporte);
+                
+                // --- FIM DA LÓGICA ADAPTADA --
 
-            } else if (this->numPacotesEntregues < this->totalPacotes){
-                // Se não há pacotes para transportar, apenas reagende o próximo evento para esta rota
-                int tempo_proximo_transporte = tempo_evento_atual + intervalo;
-                Evento proximo_transporte(tempo_proximo_transporte, 2, origem, destino);
+            } else if (this->numPacotesEntregues < this->totalPacotes) {
+                // Se não há pacotes agora, mas a simulação não acabou, agenda o próximo transporte mesmo assim.
+                Evento proximo_transporte(tempo_inicio_evento + intervalo, 2, origem, destino);
                 this->insereEvento(proximo_transporte);
             }
         }
+    
         else if (proximo_evento.getTipo() == 1) {
             
             int id_pacote_chegou = proximo_evento.getIdPacote();
@@ -131,9 +127,6 @@ void Escalonador::inicializa(Pacote* pacotes, int numPacotes, Armazem* armazens,
             }
         }
     }
-
-    std::cout << "Fim da simulacao." << std::endl;
-
 }
 // Em escalonador.cpp
 

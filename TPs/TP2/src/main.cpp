@@ -48,23 +48,24 @@ int main(int argc, char* argv[]) {
     // Uma estimativa segura pode ser (numPacotes * numArmazens) + (numArmazens * numArmazens)
     Escalonador escalonador(numeroPacotes * numeroArmazens * 2); 
 
-    Pacote* pacotes = new Pacote[numeroPacotes];
+        Pacote* pacotes = new Pacote[numeroPacotes];
     
     for (int i = 0; i < numeroPacotes; i++) {
-        int tempoChegada, chave, origem, destino;
+        int tempoChegada, chave_lida_do_arquivo, origem, destino; // Renomeie para evitar confusão
         std::string pac, org, dst;
         
         arquivo_entrada >> tempoChegada; 
-        arquivo_entrada >> pac >> chave;
+        arquivo_entrada >> pac >> chave_lida_do_arquivo; // Leia o valor, mas não o use como chave principal
         arquivo_entrada >> org >> origem;
         arquivo_entrada >> dst >> destino;
 
-        pacotes[i] = Pacote(tempoChegada, chave, origem, destino);
+        // AQUI ESTÁ A CORREÇÃO PRINCIPAL: Use o índice 'i' como a chave do pacote.
+        pacotes[i] = Pacote(tempoChegada, i, origem, destino);
         
         pacotes[i].calcularMinhaRota(transporte.getGrafo());
         
-        // Corrigindo a criação do evento para incluir o local de chegada inicial (origem)
-        Evento chegadaPacote(tempoChegada, 1, chave, origem);
+        // CORREÇÃO SECUNDÁRIA: Crie o evento de chegada usando 'i' também.
+        Evento chegadaPacote(tempoChegada, 1, i, origem);
         escalonador.insereEvento(chegadaPacote);
     }
 
@@ -72,8 +73,6 @@ int main(int argc, char* argv[]) {
     
     // Chamando o método que executa a simulação
     escalonador.inicializa(pacotes, numeroPacotes, armazens, numeroArmazens, transporte, latencia, intervalo, capacidade,custoRemocao);
-    
-    escalonador.finaliza();
 
     // Limpeza
     delete[] armazens;
