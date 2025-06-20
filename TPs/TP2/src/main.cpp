@@ -48,28 +48,33 @@ int main(int argc, char* argv[]) {
     // Uma estimativa segura pode ser (numPacotes * numArmazens) + (numArmazens * numArmazens)
     Escalonador escalonador(numeroPacotes * numeroArmazens * 2); 
 
-        Pacote* pacotes = new Pacote[numeroPacotes];
+    Pacote* pacotes = new Pacote[numeroPacotes];
     
+    int tempoPrimeiraChegada = -1;
+
     for (int i = 0; i < numeroPacotes; i++) {
-        int tempoChegada, chave_lida_do_arquivo, origem, destino; // Renomeie para evitar confusão
+        int tempoChegada, chave_lida, origem, destino;
         std::string pac, org, dst;
         
-        arquivo_entrada >> tempoChegada; 
-        arquivo_entrada >> pac >> chave_lida_do_arquivo; // Leia o valor, mas não o use como chave principal
-        arquivo_entrada >> org >> origem;
-        arquivo_entrada >> dst >> destino;
+        arquivo_entrada >> tempoChegada >> pac >> chave_lida >> org >> origem >> dst >> destino;
 
-        // AQUI ESTÁ A CORREÇÃO PRINCIPAL: Use o índice 'i' como a chave do pacote.
+        // Atualiza o tempo da primeira chegada
+        if (tempoPrimeiraChegada == -1 || tempoChegada < tempoPrimeiraChegada) {
+            tempoPrimeiraChegada = tempoChegada;
+        }
+
         pacotes[i] = Pacote(tempoChegada, i, origem, destino);
-        
         pacotes[i].calcularMinhaRota(transporte.getGrafo());
         
-        // CORREÇÃO SECUNDÁRIA: Crie o evento de chegada usando 'i' também.
         Evento chegadaPacote(tempoChegada, 1, i, origem);
         escalonador.insereEvento(chegadaPacote);
     }
 
-    transporte.agendarTransportesIniciais(escalonador, intervalo);
+    // 2. Agende os transportes iniciais baseados no tempo da primeira chegada.
+    //    O tempo do primeiro transporte será: tempoPrimeiraChegada + intervalo
+    if (tempoPrimeiraChegada != -1) {
+         transporte.agendarTransportesIniciais(escalonador, tempoPrimeiraChegada + intervalo);
+    }
     
     // Chamando o método que executa a simulação
     escalonador.inicializa(pacotes, numeroPacotes, armazens, numeroArmazens, transporte, latencia, intervalo, capacidade,custoRemocao);

@@ -1,5 +1,6 @@
 #ifndef EVENTO_H
 #define EVENTO_H
+#include <string> 
 
 class Evento {
 private:
@@ -12,6 +13,9 @@ private:
         int destino; // Usado apenas para transporte
     } dados;
 
+    std::string chave; 
+    void gera_chave();
+
 public:
     // Construtor padrão (útil para inicialização)
     Evento(); 
@@ -22,11 +26,13 @@ public:
     int getTempo() const;
     int getTipo() const;
     
+    
     // Getters para dados específicos (nomes mais claros)
     int getIdPacote() const;
     int getLocalChegada() const;
     int getOrigemTransporte() const;
     int getDestinoTransporte() const;
+    std::string getChave() const;
 };
 
 #endif
