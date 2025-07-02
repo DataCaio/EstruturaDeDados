@@ -1,5 +1,5 @@
 #include <iostream>
-#include <fstream> // --- PASSO 1: Incluir a biblioteca para arquivos
+#include <fstream> 
 #include <string>
 
 #include "grafo.hpp"
@@ -7,24 +7,23 @@
 #include "transporte.hpp"
 #include "escalonador.hpp"
 
-// --- PASSO 2: Alterar a assinatura do main ---
+
 int main(int argc, char* argv[]) {
 
-    // --- PASSO 3: Verificar se o nome do arquivo foi passado ---
+    // Verificar se o nome do arquivo foi passado
     if (argc < 2) {
         std::cerr << "Erro: Nenhum arquivo de entrada especificado!" << std::endl;
         std::cerr << "Uso: " << argv[0] << " <arquivo_de_entrada>" << std::endl;
         return 1; // Retorna um código de erro
     }
 
-    // --- PASSO 4: Abrir o arquivo ---
+    // Abrir o arquivo
     std::ifstream arquivo_entrada(argv[1]);
     if (!arquivo_entrada.is_open()) {
         std::cerr << "Erro: Nao foi possivel abrir o arquivo '" << argv[1] << "'" << std::endl;
         return 1; // Retorna um código de erro
     }
 
-    // --- A partir daqui, trocamos 'std::cin' por 'arquivo_entrada' ---
 
     int capacidade, latencia, intervalo, custoRemocao, numeroArmazens, numeroPacotes;
 
@@ -35,7 +34,7 @@ int main(int argc, char* argv[]) {
     arquivo_entrada >> numeroArmazens;
     
     Transporte transporte(numeroArmazens);
-    transporte.adicionaRotas(arquivo_entrada); // Modificamos para passar o arquivo como fonte
+    transporte.adicionaRotas(arquivo_entrada);
 
     Armazem* armazens = new Armazem[numeroArmazens]; 
     for (int i = 0; i < numeroArmazens; i++) {
@@ -44,8 +43,7 @@ int main(int argc, char* argv[]) {
 
     arquivo_entrada >> numeroPacotes;
 
-    // A capacidade do escalonador deve ser suficiente para todos os eventos
-    // Uma estimativa segura pode ser (numPacotes * numArmazens) + (numArmazens * numArmazens)
+    // A capacidade do escalonador deve ser suficiente para todos os eventos, utiliza-se uma medida segura
     Escalonador escalonador(numeroPacotes * numeroArmazens * 2); 
 
     Pacote* pacotes = new Pacote[numeroPacotes];
@@ -66,12 +64,11 @@ int main(int argc, char* argv[]) {
         pacotes[i] = Pacote(tempoChegada, i, origem, destino);
         pacotes[i].calcularMinhaRota(transporte.getGrafo());
         
-        Evento chegadaPacote(tempoChegada, 1, i, origem);
+        Evento chegadaPacote(tempoChegada, i, origem);
         escalonador.insereEvento(chegadaPacote);
     }
 
     // 2. Agende os transportes iniciais baseados no tempo da primeira chegada.
-    //    O tempo do primeiro transporte será: tempoPrimeiraChegada + intervalo
     if (tempoPrimeiraChegada != -1) {
          transporte.agendarTransportesIniciais(escalonador, tempoPrimeiraChegada + intervalo);
     }
@@ -79,9 +76,9 @@ int main(int argc, char* argv[]) {
     // Chamando o método que executa a simulação
     escalonador.inicializa(pacotes, numeroPacotes, armazens, numeroArmazens, transporte, latencia, intervalo, capacidade,custoRemocao);
 
-    // Limpeza
+    // Limpeza e outras boas práticas
     delete[] armazens;
     delete[] pacotes;
-    arquivo_entrada.close(); // Boa prática fechar o arquivo
+    arquivo_entrada.close();
     return 0;
 }

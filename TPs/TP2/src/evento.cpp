@@ -1,86 +1,70 @@
 #include "evento.hpp"
-#include <stdexcept> // Para lançar erros
-#include <string>      // Para std::to_string
-#include <sstream>     // Para std::stringstream
-#include <iomanip> 
+#include <stdexcept> 
 
 // Construtor padrão
 Evento::Evento() {
     this->tempo = -1;
-    this->tipoEvento = -1;
-}
-// --- MUDANÇA: Simplifique o operator< ---
-bool Evento::operator<(const Evento& outro) const {
-    // A única comparação necessária agora é a da chave!
-    return this->chave < outro.chave;
+    this->tipo = PACOTE; // Um valor padrão
+    this->prioridade = -1;
+    this->id_pacote = -1;
+    this->origem = -1;
+    this->destino = -1;
 }
 
-// O NOVO CONSTRUTOR UNIVERSAL
-Evento::Evento(int tempo, int tipo, int arg1, int arg2) {
+// Construtor para Chegada de Pacote
+Evento::Evento(int tempo, int id_pacote, int local_chegada) {
     this->tempo = tempo;
-    this->tipoEvento = tipo;
+    this->tipo = PACOTE;
+    this->id_pacote = id_pacote;
+    this->origem = local_chegada; 
+    this->destino = local_chegada;
 
-    if (tipo == 1) { // Chegada de Pacote
-        this->dados.id_pacote = arg1;
-        this->dados.local = arg2; 
-    } else if (tipo == 2) { // Transporte
-        this->dados.local = arg1; 
-        this->dados.destino = arg2; 
-    }
-    // Chame o novo método para construir a chave
-    gera_chave();
+    long long time_part = this->tempo;
+    long long package_part = this->id_pacote;
+    long long type_part = static_cast<long long>(this->tipo);
+    this->prioridade = (time_part * 10000000LL) + (package_part * 10LL) + type_part;
 }
 
-void Evento::gera_chave() {
-    std::ostringstream oss;
-    // Formata o tempo com 7 dígitos para evitar problemas com simulações longas
-    oss << std::setfill('0') << std::setw(7) << this->tempo;
+// Construtor para Transporte de Pacotes
+Evento::Evento(int tempo, int origem_transporte, int destino_transporte, bool is_transporte) {
+    this->tempo = tempo;
+    this->tipo = TRANSPORTE;
+    this->id_pacote = -1; // Não aplicável
+    this->origem = origem_transporte;
+    this->destino = destino_transporte;
 
-    if (this->tipoEvento == 1) { // Evento de Pacote
-        // Usa o ID do pacote e o local de chegada para desempate
-        oss << std::setfill('0') << std::setw(3) << this->dados.id_pacote;
-        oss << std::setfill('0') << std::setw(3) << this->dados.local;
-    } else if (this->tipoEvento == 2) { // Evento de Transporte
-        // Usa a origem e o destino para desempate
-        oss << std::setfill('0') << std::setw(3) << this->dados.local;
-        oss << std::setfill('0') << std::setw(3) << this->dados.destino;
-    }
-    // O tipo do evento é o último critério
-    oss << this->tipoEvento; 
-    
-    this->chave = oss.str();
+    long long time_part = this->tempo;
+    long long origin_part = this->origem;
+    long long dest_part = this->destino;
+    long long type_part = static_cast<long long>(this->tipo);
+    this->prioridade = (time_part * 10000000LL) + (origin_part * 10000LL) + (dest_part * 10LL) + type_part;
 }
-std::string Evento::getChave() const {
-    return this->chave;
+
+bool Evento::operator<(const Evento& outro) const {
+    return this->prioridade < outro.prioridade;
 }
 
 // Implementação dos Getters
-int Evento::getTempo() const {
-    return tempo;
-}
+int Evento::getTempo() const { return tempo; }
 
-int Evento::getTipo() const {
-    return tipoEvento;
-}
+TipoEvento Evento::getTipo() const { return tipo; }
 
-// Getters para tipo 1
 int Evento::getIdPacote() const {
-    if (tipoEvento != 1) throw std::logic_error("Chamada invalida: getIdPacote() so para eventos tipo 1.");
-    return dados.id_pacote;
+    if (tipo != PACOTE) throw std::logic_error("Chamada invalida: getIdPacote()");
+    return id_pacote;
 }
 
 int Evento::getLocalChegada() const {
-    if (tipoEvento != 1) throw std::logic_error("Chamada invalida: getLocalChegada() so para eventos tipo 1.");
-    return dados.local;
+    if (tipo != PACOTE) throw std::logic_error("Chamada invalida: getLocalChegada()");
+    return destino;
 }
 
-// Getters para tipo 2
 int Evento::getOrigemTransporte() const {
-    if (tipoEvento != 2) throw std::logic_error("Chamada invalida: getOrigemTransporte() so para eventos tipo 2.");
-    return dados.local;
+    if (tipo != TRANSPORTE) throw std::logic_error("Chamada invalida: getOrigemTransporte()");
+    return origem;
 }
 
 int Evento::getDestinoTransporte() const {
-    if (tipoEvento != 2) throw std::logic_error("Chamada invalida: getDestinoTransporte() so para eventos tipo 2.");
-    return dados.destino;
+    if (tipo != TRANSPORTE) throw std::logic_error("Chamada invalida: getDestinoTransporte()");
+    return destino;
 }

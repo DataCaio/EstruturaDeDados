@@ -1,9 +1,7 @@
 #ifndef FILA_H
 #define FILA_H
 
-#include <iostream> // Adicionado para std::cerr
-
-// Nó específico para a Fila
+#include <iostream> 
 struct NoFila {
     int item;
     NoFila* proximo;

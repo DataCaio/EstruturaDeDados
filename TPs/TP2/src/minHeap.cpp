@@ -11,7 +11,7 @@ Heap::Heap() {
 Heap::Heap(int maxsize) {
     this->tamanho = 0;
     this->capacidade = maxsize;
-    this->data = new Evento[maxsize]; // <-- MUDANÇA: Aloca um array de Eventos
+    this->data = new Evento[maxsize];
 }
 
 Heap::~Heap() {
@@ -22,7 +22,6 @@ Heap::~Heap() {
 
 void Heap::Inserir(const Evento& novoEvento) {
     if (tamanho == capacidade) {
-        // O ideal seria redimensionar o array, mas por enquanto vamos evitar estourar.
         std::cerr << "Erro: Heap cheio!" << std::endl;
         return;
     }
@@ -34,7 +33,7 @@ void Heap::Inserir(const Evento& novoEvento) {
 Evento Heap::Remover() {
     if (Vazio()) {
         std::cerr << "Erro: Tentando remover de um Heap vazio!" << std::endl;
-        return Evento(); // <-- MUDANÇA: Retorna um evento padrão/vazio em caso de erro.
+        return Evento(); 
     }
     
     Evento raiz = data[0];
@@ -50,35 +49,30 @@ bool Heap::Vazio() {
     return (tamanho == 0);
 }
 
-// Métodos GetAncestral, GetSucessorEsq, GetSucessorDir permanecem os mesmos
+// Métodos Getters
 int Heap::GetAncestral(int posicao) { return (posicao - 1) / 2; }
 int Heap::GetSucessorEsq(int posicao) { return (posicao * 2) + 1; }
 int Heap::GetSucessorDir(int posicao) { return (posicao * 2) + 2; }
 
-// Em Heap::HeapifyPorCima
 void Heap::HeapifyPorCima(int posicao) {
     if (posicao <= 0) return;
     
     int pai = GetAncestral(posicao);
-    // MUDANÇA: use o operador< sobrecarregado
     if (data[posicao] < data[pai]) {
         std::swap(data[posicao], data[pai]);
         HeapifyPorCima(pai);
     }
 }
 
-// Em Heap::HeapifyPorBaixo
 void Heap::HeapifyPorBaixo(int posicao) {
     int esq = GetSucessorEsq(posicao);
     int dir = GetSucessorDir(posicao);
     int menor = posicao;
 
-    // MUDANÇA: use o operador< sobrecarregado
     if (esq < tamanho && data[esq] < data[menor]) {
         menor = esq;
     }
     
-    // MUDANÇA: use o operador< sobrecarregado
     if (dir < tamanho && data[dir] < data[menor]) {
         menor = dir;
     }

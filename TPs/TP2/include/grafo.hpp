@@ -12,11 +12,9 @@ public:
     Grafo(int vertices);
     ~Grafo();
 
-    int* operator[](int i); // Supondo que você manteve a sobrecarga
+    int* operator[](int i); 
     void lerMatriz(std::ifstream& arquivo);
-
-    // --- CORREÇÃO ADICIONADA AQUI ---
-    // Permite que outras classes consultem o número de vértices de forma segura.
+    
     int getNumVertices() const {
         return numVertices;
     }

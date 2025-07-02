@@ -1,7 +1,7 @@
 #ifndef LISTA_H
 #define LISTA_H
 
-#include "iostream" // Adicionado para std::cout
+#include "iostream" 
 
 // O nó da lista, que armazena o ID de um armazém
 struct No {
@@ -29,7 +29,7 @@ public:
         this->tamanho = 0;
         
         if (outra.cabeca == nullptr) {
-            return; // A outra lista está vazia, então esta também fica.
+            return; 
         }
 
         No* atual_outro = outra.cabeca;

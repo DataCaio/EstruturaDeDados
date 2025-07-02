@@ -17,7 +17,6 @@ class Pilha{
             this->vazia = true;
         }
 
-        // --- NOVO CONSTRUTOR DE CÓPIA ---
         Pilha(const Pilha& outra) {
             this->topo = nullptr;
             this->tamanho = 0;
@@ -47,7 +46,6 @@ class Pilha{
             this->limpa();
         }
 
-        // --- NOVO OPERADOR DE ATRIBUIÇÃO ---
         Pilha& operator=(const Pilha& outra) {
             if (this == &outra) {
                 return *this;
@@ -108,7 +106,7 @@ class Pilha{
             }
         }
 
-        bool Vazia() const { // Boa prática marcar como const
+        bool Vazia() const {
             return this->vazia;
         }
 };

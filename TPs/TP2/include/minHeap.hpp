@@ -1,7 +1,7 @@
 #ifndef HEAP_HPP
 #define HEAP_HPP
 
-#include "evento.hpp" // <-- MUDANÇA: Incluir a definição de Evento
+#include "evento.hpp" 
 #include <utility>    // Para std::swap
 
 class Heap {
@@ -10,8 +10,8 @@ public:
     Heap(int maxsize);
     ~Heap();
 
-    void Inserir(const Evento& novoEvento); // <-- MUDANÇA: Recebe um Evento
-    Evento Remover();                     // <-- MUDANÇA: Retorna um Evento
+    void Inserir(const Evento& novoEvento); 
+    Evento Remover();
     bool Vazio();
 
 private:
@@ -20,8 +20,8 @@ private:
     int GetSucessorDir(int posicao);
 
     int tamanho;
-    int capacidade; // Adicionado para segurança
-    Evento* data;  // <-- MUDANÇA: O array agora é de Eventos
+    int capacidade; 
+    Evento* data;
 
     void HeapifyPorBaixo(int posicao);
     void HeapifyPorCima(int posicao);

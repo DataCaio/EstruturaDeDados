@@ -3,7 +3,6 @@ Pacote::Pacote(){
     this->chave = -1;
     this->posicao_atual_na_rota = nullptr;
 }
-// Implementação do Destrutor
 Pacote::~Pacote() {
     // O corpo do destrutor está vazio de propósito.
 }
@@ -13,12 +12,10 @@ Pacote::Pacote(const Pacote& outro) :
     origem(outro.origem),
     destino(outro.destino),
     tempoChegada(outro.tempoChegada),
-    rota(outro.rota), // << Chama o construtor de cópia de ListaEncadeada
+    rota(outro.rota),
     tempoArmazenado(outro.tempoArmazenado),
     tempoTransportado(outro.tempoTransportado)
 {
-    // A parte mais difícil é corrigir o ponteiro posicao_atual_na_rota.
-    // Ele precisa apontar para o nó correspondente na *nova* lista.
     if (outro.posicao_atual_na_rota == nullptr) {
         this->posicao_atual_na_rota = nullptr;
     } else {
@@ -53,10 +50,8 @@ void Pacote::avancarRota() {
 }
 
 void Pacote::calcularMinhaRota(Grafo& grafo) {
-    // A lógica da BFS agora vive aqui dentro.
-    // Ela usa os membros 'this->origem' e 'this->destino'.
     
-    int num_vertices = grafo.getNumVertices(); // Idealmente: grafo.getNumVertices();
+    int num_vertices = grafo.getNumVertices();
     int predecessor[num_vertices];
     bool visitados[num_vertices];
     
@@ -82,15 +77,11 @@ void Pacote::calcularMinhaRota(Grafo& grafo) {
         }
     }
 
-    // Agora, em vez de retornar uma lista, ele preenche a própria rota
-    // Usando o membro 'this->rota'.
     int atual = this->destino;
     while (atual != -1) {
         this->rota.insereNoInicio(atual);
         atual = predecessor[atual];
     }
-    
-    // IMPORTANTE: Inicializa a posição atual para o início da rota recém-calculada
     this->posicao_atual_na_rota = this->rota.getCabeca();
 }
 
@@ -110,8 +101,7 @@ int Pacote::getDestinoFinal() const {
     return destino;
 }
 
-// Este método é CRUCIAL para a lógica de armazenamento.
-// Ele diz para qual seção do armazém o pacote deve ir.
+// Diz para qual seção do armazém o pacote deve ir.
 int Pacote::getProximoDestinoNaRota() const {
     // Verifica se estamos em um ponto válido da rota E se existe um próximo nó.
     if (posicao_atual_na_rota != nullptr && posicao_atual_na_rota->proximo != nullptr) {

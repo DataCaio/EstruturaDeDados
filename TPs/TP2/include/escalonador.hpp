@@ -24,7 +24,7 @@ class Escalonador{
             int numArmazens, Transporte& transporte, 
             int latencia, int intervalo, int capacidade ,int custoRemocao);
         void insereEvento(Evento evento);
-        Evento retiraEvento(); /* possivel troca de tipo */
+        Evento retiraEvento();
         void finaliza();
 
         void AtualizaEstatisticas(Pacote& pacote_entregue);

@@ -1,5 +1,6 @@
 #include "escalonador.hpp"
 #include "iostream"
+#include "iomanip"
 
 Escalonador::Escalonador() : eventos() { // Chama o construtor padrão de Heap
     this->tempoAtual = 0;
@@ -9,8 +10,7 @@ Escalonador::Escalonador() : eventos() { // Chama o construtor padrão de Heap
     this->tempoFinalSimulacao = 0;
 }
 
-// O NOVO CONSTRUTOR COM A SOLUÇÃO CORRETA
-Escalonador::Escalonador(int capacidade) : eventos(capacidade) { // <-- A MÁGICA ACONTECE AQUI
+Escalonador::Escalonador(int capacidade) : eventos(capacidade) { 
     this->tempoAtual = 0;
     this->totalPacotes = 0;
     this->numPacotesEntregues = 0;
@@ -24,79 +24,69 @@ void Escalonador::inicializa(Pacote* pacotes, int numPacotes, Armazem* armazens,
         
         Evento proximo_evento = this->retiraEvento();
         this->tempoAtual = proximo_evento.getTempo();
-// Em TP2/src/escalonador.cpp, dentro do método Escalonador::inicializa
 
-        if (proximo_evento.getTipo() == 2) { // Evento de Transporte
+        if (proximo_evento.getTipo() == TRANSPORTE) { // Evento de Transporte
             int origem = proximo_evento.getOrigemTransporte();
             int destino = proximo_evento.getDestinoTransporte();
             int tempo_inicio_evento = this->tempoAtual;
 
             if (armazens[origem].temPacotesPara(destino)) {
-
-                // --- INÍCIO DA LÓGICA FINAL ---
-
-                // Esta pilha conterá os pacotes em ordem de processamento FIFO (mais antigo no topo)
                 Pilha pilha_processamento_fifo;
-                
-                // Passo 1: Esvaziar a seção do armazém.
-                // A remoção física segue a ordem LIFO. Imprimimos o evento aqui.
                 while (armazens[origem].temPacotesPara(destino)) {
                     Pacote p = armazens[origem].recupera(destino);
                     
                     this->tempoAtual += custoRemocao;
                     
-                    printf("%07d pacote %03d removido de %03d na secao %03d\n", this->tempoAtual, p.getChave(), origem, destino);
+                    std::cout << std::setfill('0') << std::setw(7) << this->tempoAtual
+                    << " pacote " << std::setw(3) << p.getChave()
+                    << " removido de " << std::setw(3) << origem
+                    << " na secao " << std::setw(3) << destino << std::endl;
+
                     
-                    // Empilha na nossa pilha de processamento.
-                    // Esta única inversão já deixa os pacotes em ordem FIFO para processamento.
+                    // Empilha na pilha de processamento.
                     pilha_processamento_fifo.Empilha(new Celula(p));
                 }
-
-                // --- MUDANÇA IMPORTANTE AQUI ---
-                // A pilha `pilha_processamento_fifo` está na ordem inversa da original,
-                // o que significa que o pacote mais antigo está no topo.
-                // Vamos processar DIRETAMENTE dela.
 
                 int pacotes_transportados = 0;
                 Pilha pacotes_para_rearmazenar;
 
                 while (!pilha_processamento_fifo.Vazia()) {
-                    // Desempilha() agora obtém o pacote MAIS ANTIGO primeiro.
                     Pacote p = pilha_processamento_fifo.Desempilha();
 
                     if (pacotes_transportados < capacidade) {
-                        // Pacote selecionado para transporte (lógica FIFO)
-                        printf("%07d pacote %03d em transito de %03d para %03d\n", this->tempoAtual, p.getChave(), origem, destino);
-                        Evento chegada_pacote(this->tempoAtual + latencia, 1, p.getChave(), destino);
-                        this->insereEvento(chegada_pacote);
+                        std::cout << std::setfill('0') << std::setw(7) << this->tempoAtual
+                    << " pacote " << std::setw(3) << p.getChave()
+                    << " em transito de " << std::setw(3) << origem
+                    << " para " << std::setw(3) << destino << std::endl;
+                        Evento PACOTE(this->tempoAtual + latencia, p.getChave(), destino);
+                        this->insereEvento(PACOTE);
                         pacotes_transportados++;
                     } else {
-                        // Pacote excedente é guardado para ser rearmazenado
                         pacotes_para_rearmazenar.Empilha(new Celula(p));
                     }
                 }
 
-                // Passo 3: Rearmazenar os pacotes excedentes.
+                Pilha pilha_rearmazenamento_correta;
                 while (!pacotes_para_rearmazenar.Vazia()) {
-                    Pacote p = pacotes_para_rearmazenar.Desempilha();
-                    printf("%07d pacote %03d rearmazenado em %03d na secao %03d\n", this->tempoAtual, p.getChave(), origem, destino);
+                    pilha_rearmazenamento_correta.Empilha(new Celula(pacotes_para_rearmazenar.Desempilha()));
+                }
+                while (!pilha_rearmazenamento_correta.Vazia()) {
+                    Pacote p = pilha_rearmazenamento_correta.Desempilha();
+                    std::cout << std::setfill('0') << std::setw(7) << this->tempoAtual
+                    << " pacote " << std::setw(3) << p.getChave()
+                    << " rearmazenado em " << std::setw(3) << origem
+                    << " na secao " << std::setw(3) << destino << std::endl;
                     armazens[origem].armazena(p, destino);
                 }
-
-                // Passo 4: Agendar o próximo evento de transporte.
-                Evento proximo_transporte(tempo_inicio_evento + intervalo, 2, origem, destino);
+                Evento proximo_transporte(tempo_inicio_evento + intervalo, origem, destino, true);
                 this->insereEvento(proximo_transporte);
-                
-                // --- FIM DA LÓGICA FINAL ---
-
             } else if (this->numPacotesEntregues < this->totalPacotes) {
-                Evento proximo_transporte(tempo_inicio_evento + intervalo, 2, origem, destino);
+                Evento proximo_transporte(tempo_inicio_evento + intervalo, origem, destino, true);
                 this->insereEvento(proximo_transporte);
             }
         }
-        // O resto do seu código no loop while permanece igual
     
-        else if (proximo_evento.getTipo() == 1) { // Evento de Chegada de Pacote
+        if (proximo_evento.getTipo() == PACOTE) {
             
             int id_pacote_chegou = proximo_evento.getIdPacote();
             int local_chegada = proximo_evento.getLocalChegada();
@@ -110,13 +100,13 @@ void Escalonador::inicializa(Pacote* pacotes, int numPacotes, Armazem* armazens,
             }
             
             if (pacote_atual != nullptr) {
-                // --- LÓGICA CORRIGIDA AQUI ---
-
                 // 1. O pacote chegou fisicamente em 'local_chegada'.
                 //    Verificamos se este local JÁ é o seu destino final.
                 if (local_chegada == pacote_atual->getDestinoFinal()) {
                     pacote_atual->alteraEstado("Entregue");
-                    printf("%07d pacote %03d entregue em %03d\n", this->tempoAtual, id_pacote_chegou, local_chegada);
+                    std::cout << std::setfill('0') << std::setw(7) << this->tempoAtual
+                    << " pacote " << std::setw(3) << id_pacote_chegou
+                    << " entregue em " << std::setw(3) << local_chegada << std::endl;
                     this->AtualizaEstatisticas(*pacote_atual);
                 } 
                 // 2. Se não é o destino final, o pacote precisa ser armazenado
@@ -130,15 +120,14 @@ void Escalonador::inicializa(Pacote* pacotes, int numPacotes, Armazem* armazens,
                         //     na seção que leva ao PRÓXIMO destino.
                         armazens[local_chegada].armazena(*pacote_atual, proximo_destino_na_rota);
                         pacote_atual->alteraEstado("Armazenado");
-                        printf("%07d pacote %03d armazenado em %03d na secao %03d\n", this->tempoAtual, id_pacote_chegou, local_chegada, proximo_destino_na_rota);
-                        
+                        std::cout << std::setfill('0') << std::setw(7) << this->tempoAtual
+                        << " pacote " << std::setw(3) << id_pacote_chegou
+                        << " armazenado em " << std::setw(3) << local_chegada
+                        << " na secao " << std::setw(3) << proximo_destino_na_rota << std::endl;
+                                        
                         // 2c. AGORA que já usamos a informação, avançamos o ponteiro interno da rota.
                         pacote_atual->avancarRota();
                     } else {
-                        // Este é o local do seu "CHAMAR O GEMINI". Ele indica um erro lógico.
-                        // Se um pacote não está no destino final, ele DEVE ter um próximo passo.
-                        // Se não tem, a rota foi calculada errada ou gerenciada de forma incorreta.
-                        // Com a lógica corrigida, este trecho não deve mais ser alcançado.
                         std::cerr << "ERRO LOGICO INESPERADO: Pacote " << id_pacote_chegou 
                                   << " em " << local_chegada 
                                   << " sem proximo destino definido." << std::endl;
@@ -148,7 +137,6 @@ void Escalonador::inicializa(Pacote* pacotes, int numPacotes, Armazem* armazens,
         }
     }
 }
-// Em escalonador.cpp
 
 void Escalonador::insereEvento(Evento evento) {
     // A chamada agora passa o objeto Evento inteiro.

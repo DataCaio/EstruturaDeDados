@@ -2,37 +2,43 @@
 #define EVENTO_H
 #include <string> 
 
+enum TipoEvento {
+    PACOTE = 1,
+    TRANSPORTE = 2
+};
+
 class Evento {
 private:
-    int tempo;
-    int tipoEvento; // 1: Chegada de Pacote, 2: Transporte
-
-    struct Dados {
-        int id_pacote;
-        int local; // Usado tanto para local_chegada quanto para origem/destino
-        int destino; // Usado apenas para transporte
-    } dados;
-
-    std::string chave; 
-    void gera_chave();
+    // A chave de prioridade agora é um 'long long' para o cálculo numérico.
+    long long prioridade; 
 
 public:
-    // Construtor padrão (útil para inicialização)
-    Evento(); 
 
-    Evento(int tempo, int tipo, int arg1, int arg2);
+    int tempo;
+    TipoEvento tipo;
+    int id_pacote;
+    int origem;
+    int destino;
+
+    // Construtor padrão
+    Evento();
+
+    // Construtor para eventos de PACOTE
+    Evento(int tempo, int id_pacote, int local_chegada);
+
+    // Construtor para eventos de TRANSPORTE
+    Evento(int tempo, int origem_transporte, int destino_transporte, bool is_transporte);
+
+    // O operador de comparação agora usa a prioridade numérica.
     bool operator<(const Evento& outro) const;
-    // Getters
+    
+    // --- Getters ---
     int getTempo() const;
-    int getTipo() const;
-    
-    
-    // Getters para dados específicos (nomes mais claros)
+    TipoEvento getTipo() const;
     int getIdPacote() const;
     int getLocalChegada() const;
     int getOrigemTransporte() const;
     int getDestinoTransporte() const;
-    std::string getChave() const;
 };
 
 #endif

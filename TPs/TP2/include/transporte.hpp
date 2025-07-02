@@ -2,7 +2,6 @@
 #define TRANSPORTE_H
 
 #include "grafo.hpp"
-/* #include "escalonador.hpp" */
 
 #include <iostream>
 #include <fstream>
