@@ -50,30 +50,34 @@ int main(int argc, char* argv[]) {
 
     Pacote* pacotes = new Pacote[numeroPacotes];
     
+    int tempoPrimeiraChegada = -1;
+
     for (int i = 0; i < numeroPacotes; i++) {
-        int tempoChegada, chave, origem, destino;
+        int tempoChegada, chave_lida, origem, destino;
         std::string pac, org, dst;
         
-        arquivo_entrada >> tempoChegada; 
-        arquivo_entrada >> pac >> chave;
-        arquivo_entrada >> org >> origem;
-        arquivo_entrada >> dst >> destino;
+        arquivo_entrada >> tempoChegada >> pac >> chave_lida >> org >> origem >> dst >> destino;
 
-        pacotes[i] = Pacote(tempoChegada, chave, origem, destino);
-        
+        // Atualiza o tempo da primeira chegada
+        if (tempoPrimeiraChegada == -1 || tempoChegada < tempoPrimeiraChegada) {
+            tempoPrimeiraChegada = tempoChegada;
+        }
+
+        pacotes[i] = Pacote(tempoChegada, i, origem, destino);
         pacotes[i].calcularMinhaRota(transporte.getGrafo());
         
-        // Corrigindo a criação do evento para incluir o local de chegada inicial (origem)
-        Evento chegadaPacote(tempoChegada, 1, chave, origem);
+        Evento chegadaPacote(tempoChegada, 1, i, origem);
         escalonador.insereEvento(chegadaPacote);
     }
 
-    transporte.agendarTransportesIniciais(escalonador, intervalo);
+    // 2. Agende os transportes iniciais baseados no tempo da primeira chegada.
+    //    O tempo do primeiro transporte será: tempoPrimeiraChegada + intervalo
+    if (tempoPrimeiraChegada != -1) {
+         transporte.agendarTransportesIniciais(escalonador, tempoPrimeiraChegada + intervalo);
+    }
     
     // Chamando o método que executa a simulação
     escalonador.inicializa(pacotes, numeroPacotes, armazens, numeroArmazens, transporte, latencia, intervalo, capacidade,custoRemocao);
-    
-    escalonador.finaliza();
 
     // Limpeza
     delete[] armazens;

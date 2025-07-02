@@ -1,0 +1,1 @@
+make clean && make all && clear && bin/tp2.out teste9.txt

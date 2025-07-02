@@ -14,7 +14,8 @@ class Escalonador{
 
          int numPacotesEntregues;
         double tempoTotalEmSistema; // Usar double para a média
-
+        int totalPacotes;
+        int tempoFinalSimulacao;
 
     public:
         Escalonador();
