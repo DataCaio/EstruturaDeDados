@@ -2,7 +2,7 @@
 #define LISTA_HPP
 
 #include <iostream>
-#include <stdexcept> // For std::out_of_range
+#include <stdexcept>
 
 template <typename T>
 struct No {
@@ -19,7 +19,6 @@ private:
     int tamanho;
 
 public:
-    // Construtor
     ListaEncadeada() : cabeca(nullptr), tamanho(0) {}
 
     // Construtor de cópia (deep copy)
@@ -44,7 +43,6 @@ public:
         }
     }
 
-    // Destrutor
     ~ListaEncadeada() {
         No<T>* atual = cabeca;
         while (atual) {
@@ -52,11 +50,10 @@ public:
             delete atual;
             atual = proximo_no;
         }
-        cabeca = nullptr; // Ensure head is null after deletion
-        tamanho = 0;     // Reset size
+        cabeca = nullptr; 
+        tamanho = 0;    
     }
 
-    // Adiciona um elemento no início da lista
     void insereNoInicio(const T& valor) {
         No<T>* novo_no = new No<T>(valor);
         novo_no->proximo = cabeca;
@@ -64,7 +61,6 @@ public:
         tamanho++;
     }
 
-    // Adiciona um elemento no final da lista
     void adicionaNoFim(const T& valor) {
         No<T>* novo_no = new No<T>(valor);
         if (cabeca == nullptr) {
@@ -77,16 +73,6 @@ public:
             atual->proximo = novo_no;
         }
         tamanho++;
-    }
-
-    // Exibe todos os elementos da lista (para depuração)
-    void exibir() const {
-        No<T>* atual = cabeca;
-        while (atual) {
-            std::cout << atual->dado << " -> ";
-            atual = atual->proximo;
-        }
-        std::cout << "FIM\n";
     }
 
     // Retorna o elemento em um índice específico

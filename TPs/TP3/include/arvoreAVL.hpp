@@ -1,21 +1,15 @@
 #ifndef ARVOREAVL_HPP
 #define ARVOREAVL_HPP
+  
+#include <iostream>
 
-#include <cstddef>     // For nullptr
-#include <algorithm>   // For std::max (alternatively use your maximo function)
-#include <iostream>    // For std::cout in emOrdem (for debugging)
 
-// Helper function (can be global or member of the class)
-int maximo(int a, int b){
-    return (a > b) ? a : b;
-}
-
-template <typename K, typename V> // Added K for Key and V for Value
+template <typename K, typename V> 
 class ArvoreAVL {
     private:
         struct No {
-            K chave;    // The key for comparison
-            V valor;    // The value associated with the key
+            K chave;    // Chave para comparação
+            V valor;    // Valor associado
             No* esquerdo;
             No* direito;
             int altura;
@@ -37,7 +31,8 @@ class ArvoreAVL {
         }
 
         void atualizarAltura(No* no) {
-            no->altura = 1 + maximo(altura(no->esquerdo), altura(no->direito));     
+            int maximo = altura(no->esquerdo) > altura(no->direito) ? altura(no->esquerdo) : altura(no->direito);
+            no->altura = 1 + maximo;
         }
 
         // Rotação simples à direita
@@ -69,26 +64,26 @@ class ArvoreAVL {
         }
 
         // Balanceamento após inserção
-        No* balancear(No* no, const K& chave) { // Balance based on the key
+        No* balancear(No* no, const K& chave) {
             atualizarAltura(no);
             int fb = fatorBalanceamento(no);
 
             // Caso esquerda-esquerda (LL)
-            if (fb > 1 && chave < no->esquerdo->chave) // Compare with key
+            if (fb > 1 && chave < no->esquerdo->chave)
                 return rotacaoDireita(no);
 
             // Caso direita-direita (RR)
-            if (fb < -1 && chave > no->direito->chave) // Compare with key
+            if (fb < -1 && chave > no->direito->chave)
                 return rotacaoEsquerda(no);
 
             // Caso esquerda-direita (LR)
-            if (fb > 1 && chave > no->esquerdo->chave) { // Compare with key
+            if (fb > 1 && chave > no->esquerdo->chave) { 
                 no->esquerdo = rotacaoEsquerda(no->esquerdo);
                 return rotacaoDireita(no);
             }
 
             // Caso direita-esquerda (RL)
-            if (fb < -1 && chave < no->direito->chave) { // Compare with key
+            if (fb < -1 && chave < no->direito->chave) {
                 no->direito = rotacaoDireita(no->direito);
                 return rotacaoEsquerda(no);
             }
@@ -96,30 +91,29 @@ class ArvoreAVL {
             return no;
         }
 
-        // Inserção recursiva (agora com chave e valor)
+        // Inserção recursiva
         No* inserir(No* no, const K& chave, const V& valor) {
             if (!no) {
                 tamanho++;
-                return new No(chave, valor); // Create node with key and value
+                return new No(chave, valor); 
             }
 
-            if (chave < no->chave) // Compare with key
+            if (chave < no->chave) 
                 no->esquerdo = inserir(no->esquerdo, chave, valor);
-            else if (chave > no->chave) // Compare with key
+            else if (chave > no->chave) 
                 no->direito = inserir(no->direito, chave, valor);
             else {
-                // Se a chave já existe, atualiza o valor
                 no->valor = valor; 
                 return no;
             }
 
-            return balancear(no, chave); // Balance based on the key
+            return balancear(no, chave);
         }
 
         // Busca recursiva (retorna ponteiro para o valor)
         V* busca(No* no, const K& chave) const {
             if (!no) {
-                return nullptr; // Chave não encontrada
+                return nullptr; 
             }
 
             if (chave < no->chave) {
@@ -127,17 +121,7 @@ class ArvoreAVL {
             } else if (chave > no->chave) {
                 return busca(no->direito, chave);
             } else {
-                return &(no->valor); // Chave encontrada, retorna ponteiro para o valor
-            }
-        }
-
-        // Impressão In-Order (recursiva) - para depuração
-        void emOrdem(No* no) const {
-            if (no) {
-                emOrdem(no->esquerdo);
-                // Assume que V tem um operador << ou pode ser impresso diretamente
-                std::cout << "(" << no->chave << ": " << no->valor << ") "; 
-                emOrdem(no->direito);
+                return &(no->valor);
             }
         }
 
