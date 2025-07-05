@@ -26,7 +26,7 @@ inline TipoEvento stringToTipoEvento(const std::string& s) {
 }
 
 struct EventoBase {
-    int dataHora;
+    int tempo;
     TipoEvento tipo;
     int idPacote;
     std::string linhaOriginal;
@@ -34,7 +34,7 @@ struct EventoBase {
     virtual ~EventoBase() = default;
 
     EventoBase(int dh, TipoEvento t, int id, const std::string& original)
-        : dataHora(dh), tipo(t), idPacote(id), linhaOriginal(original) {}
+        : tempo(dh), tipo(t), idPacote(id), linhaOriginal(original) {}
 };
 
 struct EventoRG : public EventoBase {

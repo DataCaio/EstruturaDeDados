@@ -150,19 +150,6 @@ class ArvoreAVL {
         V* busca(const K& chave) const {
             return busca(raiz, chave);
         }
-
-        void imprimirEmOrdem() const {
-            emOrdem(raiz);
-            std::cout << std::endl;
-        }
-
-        int obterTamanho() const {
-            return tamanho;
-        }
-
-        int obterAltura() const {
-            return altura(raiz);
-        }
 };
 
 #endif

@@ -3,3 +3,9 @@ TP2/Archive/*
 *.json
 TP2/venv/*
 */.vscode/*
+*.txt
+*.sh
+*.c
+*.log
+*.csv
+exp/*

@@ -64,13 +64,6 @@ public:
         return capacidade;
     }
 
-    // Imprime todos os elementos
-    void exibir() const {
-        for (int i = 0; i < tamanho; i++) {
-            std::cout << dados[i] << " ";
-        }
-        std::cout << "\n";
-    }
 };
 
 #endif

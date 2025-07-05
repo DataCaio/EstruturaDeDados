@@ -11,10 +11,6 @@ public:
 
     Cliente(const std::string& n = "") : nome(n) {}
 
-
-    bool operator<(const Cliente& other) const { return nome < other.nome; }
-    bool operator>(const Cliente& other) const { return nome > other.nome; }
-    bool operator==(const Cliente& other) const { return nome == other.nome; }
 };
 
 #endif 
