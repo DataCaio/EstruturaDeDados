@@ -16,7 +16,7 @@ template <typename T>
 class ListaEncadeada {
 private:
     No<T>* cabeca;
-    No<T>* cauda; // <-- NOVO: Ponteiro para o último nó
+    No<T>* cauda;
     int tamanho;
 
     // Função auxiliar para limpar a lista (evita duplicação de código)
@@ -93,8 +93,7 @@ public:
         return false;
     }
     
-    // <-- NOVO: Método para permitir iteração externa eficiente
-    No<T>* getCabeca(){
+    No<T>* getCabeca() const {
         return cabeca;
     }
 

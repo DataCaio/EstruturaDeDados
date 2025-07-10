@@ -1,1 +1,0 @@
-make clean && make all && clear && bin/tp3.out teste.txt && make clean

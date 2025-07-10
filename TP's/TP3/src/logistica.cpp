@@ -1,12 +1,9 @@
-// TP3/src/logistica.cpp
 #include "../include/logistica.hpp"
 #include <sstream>
 #include <iomanip>
 #include <iostream>
-#include <chrono> // Adicionado para medição de tempo
 
-Logistica::Logistica() : totalEventProcessingTimeUs(0), totalCLQueryTimeUs(0), totalPCQueryTimeUs(0) {
-    // Inicializa os acumuladores de tempo
+Logistica::Logistica() {
 }
 
 Logistica::~Logistica() {
@@ -118,29 +115,20 @@ void Logistica::processarLinha(const std::string& linha) {
     }
 
     if (tipoLinha == "EV") {
-        auto start = std::chrono::high_resolution_clock::now(); // Inicia timer para Evento
         EventoBase* novoEvento = criarEventoDeLinha(linha);
         if (novoEvento) {
             eventos.insereFinal(novoEvento);
             int eventIndex = eventos.size() - 1;
             atualizarIndices(novoEvento, eventIndex);
         }
-        auto end = std::chrono::high_resolution_clock::now(); // Finaliza timer para Evento
-        totalEventProcessingTimeUs += std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     } else if (tipoLinha == "CL") {
-        auto start = std::chrono::high_resolution_clock::now(); // Inicia timer para Consulta CL
         std::string nomeCliente;
         iss >> nomeCliente;
         processarConsultaCL(tempo, nomeCliente);
-        auto end = std::chrono::high_resolution_clock::now(); // Finaliza timer para Consulta CL
-        totalCLQueryTimeUs += std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     } else if (tipoLinha == "PC") {
-        auto start = std::chrono::high_resolution_clock::now(); // Inicia timer para Consulta PC
         int idPacote;
         iss >> idPacote;
         processarConsultaPC(tempo, idPacote);
-        auto end = std::chrono::high_resolution_clock::now(); // Finaliza timer para Consulta PC
-        totalPCQueryTimeUs += std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     }
 }
 
@@ -152,14 +140,15 @@ void Logistica::processarConsultaCL(int tempoConsulta, const std::string& nomeCl
 
     Cliente* clienteBuscado = indiceClientes.busca(nomeCliente);
     if (clienteBuscado) {
-        for (int i = 0; i < clienteBuscado->pacotes.size(); ++i) {
-            int idPacote = clienteBuscado->pacotes.getElemento(i);
-            Pacote* pacoteInfo = indicePacotes.busca(idPacote);
-            
-            if (pacoteInfo) {
-                EventoRG* rgEvent = static_cast<EventoRG*>(eventos[pacoteInfo->linhaRG]);
-                if (rgEvent && rgEvent->tempo <= tempoConsulta) {
-                    if (rgEvent->remetente == nomeCliente || rgEvent->destinatario == nomeCliente) {
+        No<int>* noPacote = clienteBuscado->pacotes.getCabeca();
+            while (noPacote != nullptr) {
+                int idPacote = noPacote->dado;
+                Pacote* pacoteInfo = indicePacotes.busca(idPacote);
+                
+                if (pacoteInfo) {
+                    // Adiciona o evento de Registro (RG) se for válido
+                    EventoRG* rgEvent = static_cast<EventoRG*>(eventos[pacoteInfo->linhaRG]);
+                    if (rgEvent && rgEvent->tempo <= tempoConsulta) {
                         bool alreadyAdded = false;
                         for(int k=0; k<eventosParaRespostaCL.size(); ++k) {
                             if (eventosParaRespostaCL[k] == rgEvent) {
@@ -171,38 +160,40 @@ void Logistica::processarConsultaCL(int tempoConsulta, const std::string& nomeCl
                             eventosParaRespostaCL.insereFinal(rgEvent);
                         }
                     }
-                }
 
-                EventoBase* lastNonRGEvent = nullptr;
-                for (int j = 0; j < pacoteInfo->historico.size(); ++j) {
-                    int eventIndex = pacoteInfo->historico.getElemento(j);
-                    EventoBase* currentEvent = eventos[eventIndex];
+                    // Encontra o último evento não-RG antes do tempo da consulta
+                    EventoBase* lastNonRGEvent = nullptr;
                     
-                    if (currentEvent->tempo <= tempoConsulta) {
-                        if (currentEvent->tipo != RG) {
-                            if (!lastNonRGEvent || currentEvent->tempo > lastNonRGEvent->tempo) {
-                                lastNonRGEvent = currentEvent;
-                            } else if (currentEvent->tempo == lastNonRGEvent->tempo) {
-                                lastNonRGEvent = currentEvent; 
+                    No<int>* noHistorico = pacoteInfo->historico.getCabeca();
+                    while (noHistorico != nullptr) {
+                        int eventIndex = noHistorico->dado;
+                        EventoBase* currentEvent = eventos[eventIndex];
+                        
+                        if (currentEvent->tempo <= tempoConsulta) {
+                            if (currentEvent->tipo != RG) {
+                                if (!lastNonRGEvent || currentEvent->tempo >= lastNonRGEvent->tempo) {
+                                    lastNonRGEvent = currentEvent;
+                                }
                             }
+                        }
+                        noHistorico = noHistorico->proximo;
+                    }
+                    if (lastNonRGEvent) {
+                        bool alreadyAdded = false;
+                        for (int k = 0; k < eventosParaRespostaCL.size(); ++k) {
+                            if (eventosParaRespostaCL[k] == lastNonRGEvent) {
+                                alreadyAdded = true;
+                                break;
+                            }
+                        }
+                        if (!alreadyAdded) {
+                            eventosParaRespostaCL.insereFinal(lastNonRGEvent);
                         }
                     }
                 }
-                if (lastNonRGEvent) {
-                     bool alreadyAdded = false;
-                     for (int k = 0; k < eventosParaRespostaCL.size(); ++k) {
-                         if (eventosParaRespostaCL[k] == lastNonRGEvent) {
-                             alreadyAdded = true;
-                             break;
-                         }
-                     }
-                     if (!alreadyAdded) {
-                         eventosParaRespostaCL.insereFinal(lastNonRGEvent);
-                     }
-                }
+                noPacote = noPacote->proximo;
             }
         }
-    }
 
     for (int i = 0; i < eventosParaRespostaCL.size(); ++i) {
         int min_idx = i;
@@ -237,30 +228,18 @@ void Logistica::processarConsultaPC(int tempoConsulta, int idPacote) {
 
     Pacote* pacoteBuscado = indicePacotes.busca(idPacote);
     if (pacoteBuscado) {
-        for (int i = 0; i < pacoteBuscado->historico.size(); ++i) {
-            int eventIndex = pacoteBuscado->historico.getElemento(i);
+        No<int>* noAtual = pacoteBuscado->historico.getCabeca();
+        while (noAtual != nullptr) {
+            int eventIndex = noAtual->dado;
             EventoBase* event = eventos[eventIndex];
-            
             if (event->tempo <= tempoConsulta) {
                 respostaPC.adicionaNoFim(event->linhaOriginal);
             }
+            noAtual = noAtual->proximo;
         }
     }
     std::cout << respostaPC.size() << std::endl;
     for (int i = 0; i < respostaPC.size(); ++i) {
         std::cout << respostaPC.getElemento(i) << std::endl;
     }
-}
-
-// Métodos para obter os tempos acumulados
-long long Logistica::getTotalEventProcessingTime() const {
-    return totalEventProcessingTimeUs;
-}
-
-long long Logistica::getTotalCLQueryTime() const {
-    return totalCLQueryTimeUs;
-}
-
-long long Logistica::getTotalPCQueryTime() const {
-    return totalPCQueryTimeUs;
 }
