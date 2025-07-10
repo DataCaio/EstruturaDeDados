@@ -4,7 +4,6 @@ TP2/Archive/*
 TP2/venv/*
 */.vscode/*
 *.txt
-*.sh
 *.c
 *.log
 *.csv
